@@ -5,25 +5,44 @@
 	<title>Budgetter</title>
 	<link rel="stylesheet/less" href="css/main.less" />
 	<script src="js/less-1.0.33.min.js" type="text/javascript"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+	<script src="js/core.js"></script>
+	<script src="js/budget.js"></script>
+		<script type="text/javascript" charset="utf-8">
+	    less.env = "development";
+	    less.watch();
+	    less.poll = 500;
+	</script>
 </head>
 <body>
 	<header>
 		<h1>Budgetter</h1>
+		
+		<menu>
+			<li>
+				<button class="left-edge">as</button>
+				<button class="right-edge">as</button>
+			</li>
+		</menu>
 	</header>
 	<div id="main">
 		<table id="budget">
 			<tbody>
 				<tr>
-					<th>asdf</th>
+					<th contenteditable></th>
 					<td>300</td>
 				</tr>
 				<tr>
-					<th>asdf2</th>
+					<th contenteditable></th>
 					<td>400</td>
 				</tr>
 				<tr>
-					<th>asdf4</th>
+					<th contenteditable></th>
 					<td>213</td>
+				</tr>
+				<tr>
+					<th contenteditable></th>
+					<td>399</td>
 				</tr>
 			</tbody>
 		</table>

@@ -7,16 +7,68 @@ body {
 
 header {
 	height: 70px;
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0.0, #224e71), color-stop(0.5, #254c68), color-stop(0.5, #1c4561), to(#204257));
 	border-bottom: 1px solid #000;
+	-webkit-box-shadow: rgba(0, 0, 0, .3) 0 3px 2px, inset rgba(255, 255, 255, .2) 0 -1px 0 0;
+	
+	h1 {
+		font-size: 33px;
+		float: left;
+		height: 70px;
+		line-height: 68px;
+		padding: 0 30px;
+		color: #eee;
+		text-shadow: -1px -1px #000;
+	}
+	
+	menu {
+		list-style: none;
+		margin: 10px;
+		display: block;
+		-webkit-box-shadow: rgba(0, 0, 0, .2) 0 3px 2px;
+		float: left;
+		-webkit-border-radius: 3px;
+		overflow: hidden;
+		margin-top: 20px;
+		margin-left: 100px;
+					
+		button {
+			background: -moz-linear-gradient(top, #fff, blue);
+			background: -webkit-gradient(linear, left top, left bottom, color-stop(0.0, #fff), color-stop(0.1, #f4f4f4), color-stop(0.5, #c3c3c3), color-stop(0.5, #b9b9b9), color-stop(0.9, #b0b0b0));
+			padding: 7px 20px;
+			border: 1px solid #000;
+			margin: 0;
+			float: left;
+			cursor: pointer;
+		}
+		button:active {
+			position: relative;
+			top: 1px;
+		}
+		
+		button.left-edge {
+			-webkit-border-top-left-radius: 3px;
+			-webkit-border-bottom-left-radius: 3px;
+			border-right: 0;
+		}
+		button.right-edge {
+			border-left-color: #888;
+			-webkit-border-top-right-radius: 3px;
+			-webkit-border-bottom-right-radius: 3px;
+		}
+	}
 }
 
 #budget {
 	width: 100%;
 	
 	th, td {
-		padding: 5px 10px;
 		border-bottom: 1px solid #ddd;
 		font-weight: 400;
+		font-size: 14px;
+		line-height: 1.4;
+		vertical-align: top;
+		padding: 5px 10px;
 	}
 	
 	tbody th {
