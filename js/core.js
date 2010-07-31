@@ -15,10 +15,11 @@
 		
 		return {
 			executeSql: function (sql, data, callback) {
-				console.log(data);
 				_db.transaction( function (tx) {
 					tx.executeSql(sql, data || [], function (tx, res) {
-						callback(res);
+						if (callback) {
+							callback(res);
+						}
 					}, db.error);
 				});
 			},
