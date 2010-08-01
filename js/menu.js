@@ -35,10 +35,6 @@ jQuery(document).ready( function () {
 	
 	/*
 	 * Test */
-	
-	var itemGroup = Menu.addMenuGroup('test');
-	itemGroup.addMenuItem('test2').text('test');
-	itemGroup.addMenuItem('test3').text('test2');
-	
+
 	Core.addModule('menu', Menu);
 });

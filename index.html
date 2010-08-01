@@ -13,6 +13,24 @@
 	    less.env = "development";
 	    less.watch();
 	    less.poll = 500;
+	    
+	    jQuery( function ($) {
+	    	var Menu = _budgetter.getModule('menu'),
+	    		Budget = _budgetter.getModule('budget');
+	    	
+	   		var itemGroup = Menu.addMenuGroup('file');
+			itemGroup.addMenuItem('test2').text('New Budget').click( function () {
+				$('#newBudget').show();
+			});
+			
+			$('#newBudget').submit( function (e) {
+				e.preventDefault();
+				
+				var budgetName = $('input[type="text"]', this).val();
+				
+				Budget.newBudget( budgetName );
+			});
+	    });
 	</script>
 </head>
 <body>
@@ -26,6 +44,10 @@
 			</li>
 		</menu>
 	</header>
+	<form id="newBudget" style="display:none;">
+		<input type="text" name="budget_name" placeholder="Budget name" />
+		<input type="submit" value="Go" />
+	</form>
 	<div id="main">
 		<table id="budget">
 			<tbody>
