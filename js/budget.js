@@ -3,9 +3,7 @@
 	
 	/*
 	 * API */
-	var Budget = function () {
-		var _loadedBudget;
-		
+	var Budget = function () {	
 		return {
 			newBudget: function (budget_name) {
 				Core.executeSql('INSERT INTO budgets (name) VALUES (?)', [budget_name], function (res) {
@@ -13,13 +11,25 @@
 				});
 			},
 			addLine: function (text) {
-				Core.executeSql('INSERT INTO lines (budget_id, text, line_number, type) VALUES (?, ?, 1, "normal")', [_loadedBudget, text]);
+				Core.executeSql('INSERT INTO lines (budget_id, text, line_number, type) VALUES (?, ?, 1, "normal")', [localStorage.getItem('loadedBudget'), text]);
 			},
 			updateLine: function (text, budget_id) {
 				Core.executeSql('UPDATE lines SET text = ? WHERE budget_id = ?', [text, budget_it]);	
 			},
+			getBudgets: function (callback) {
+				Core.executeSql('SELECT * FROM budgets', [], function (res) {
+					var budgets = {};
+					
+					for (i = 0; i < res.rows.length; i++) {
+						budgets[i] = res.rows.item(i);
+					}
+					budgets.length = res.rows.length;
+					
+					return budgets;
+				});
+			},
 			loadBudget: function (budget_id) {
-				_loadedBudget = budget_id;
+				localStorage.setItem('loadedBudget', budget_id);
 				
 				$('#budget').find('tbody').empty();
 				
@@ -57,7 +67,9 @@
 		});
 	});
 	
-	Budget.loadBudget(5);
+	Budget.getBudgets();
+	
+	Budget.loadBudget( localStorage.getItem('loadedBudget') || 1 );
 	
 	Core.addModule('budget', Budget); 
 })(window);
