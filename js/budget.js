@@ -57,7 +57,7 @@
 		
 						for (i = 0; i < result.rows.length; i++) {
 							var row = result.rows.item(i);
-							html = html + '<tr><th contenteditable data-is-new="0" data-id="' + row.id + '">' + row.text + '</th><td>asdf</td></tr>';
+							html = html + '<tr draggable="true"><th contenteditable data-is-new="0" data-id="' + row.id + '">' + row.text + '</th><td>asdf</td></tr>';
 						};
 						html += '<tr><th contenteditable data-is-new="1"></th><td></td></tr>';
 						
@@ -107,6 +107,7 @@
 		
 		budgetList.delegate('li', 'click', function (e) {
 			Budget.loadBudget( $(this).attr('data-budget-id') );
+			budgetList.hide();
 		});
 	});
 
