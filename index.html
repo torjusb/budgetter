@@ -17,6 +17,8 @@
 	    jQuery( function ($) {
 	    	var Menu = _budgetter.getModule('menu'),
 	    		Budget = _budgetter.getModule('budget');
+
+	    	Menu.setContainer( $('#menuContainer') );
 	    	
 	   		var itemGroup = Menu.addMenuGroup('file');
 			itemGroup.addMenuItem('test2').text('New Budget').click( function () {
@@ -40,13 +42,7 @@
 <body>
 	<header>
 		<h1>Budgetter</h1>
-		
-		<menu>
-			<li>
-				<button class="left-edge">as</button>
-				<button class="right-edge">as</button>
-			</li>
-		</menu>
+		<menu id="menuContainer"></menu>
 	</header>
 	<ul id="budgets">
 	
@@ -57,6 +53,7 @@
 	</form>
 	<div id="main">
 		<table id="budget">
+			<col id="col1" />
 			<tbody>
 			</tbody>
 		</table>
