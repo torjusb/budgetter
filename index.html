@@ -59,53 +59,10 @@
 			colMover.bind('mousedown mouseup', function (e) {
 				mouseKeyDown = e.type === 'mousedown' ? true : false;
 			});
-var addEvent = (function () {
-  if (document.addEventListener) {
-    return function (el, type, fn) {
-      if (el && el.nodeName || el === window) {
-        el.addEventListener(type, fn, false);
-      } else if (el && el.length) {
-        for (var i = 0; i < el.length; i++) {
-          addEvent(el[i], type, fn);
-        }
-      }
-    };
-  } else {
-    return function (el, type, fn) {
-      if (el && el.nodeName || el === window) {
-        el.attachEvent('on' + type, function () { return fn.call(el, window.event); });
-      } else if (el && el.length) {
-        for (var i = 0; i < el.length; i++) {
-          addEvent(el[i], type, fn);
-        }
-      }
-    };
-  }
-})();			
-/*
-			setTimeout( function () {
-				addEvent($('tr').get(), 'dragstart', function (e) {
-					console.log(e);
-				});
-			}, 500);
-*/
-
-			$('table').delegate('tr', 'dragstart', function (e) {
-				e.dataTransfer.effectAllowed = 'move';
-				e.dataTransfer.setData('Text', $(this).children('th').attr('data-id'));
-				console.log(e);
-			});
-			$('tbody').bind('dragover dragenter', function (e) {
-				e.preventDefault();
-			});
-			$('tbody').bind('drop', function (e) {
-				console.log(e);
-			});
 		});
 	</script>
 </head>
 <body>
-	<p draggable="true" id="hey">ads</p>
 	<header>
 		<h1>Budgetter</h1>
 		<menu id="menuContainer"></menu>
