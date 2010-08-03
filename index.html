@@ -12,7 +12,7 @@
 	<script type="text/javascript" charset="utf-8">
 	    less.env = "development";
 	    less.watch();
-	    less.poll = 500;
+	    less.poll = 250;
 	    
 	    jQuery( function ($) {
 	    	var Menu = _budgetter.getModule('menu'),
@@ -36,6 +36,28 @@
 				
 				Budget.newBudget( budgetName );
 			});
+			
+			
+			var colMover = $('#col-mover'),
+				budgetCol = $('#col1'),
+				mouseKeyDown = false;
+			
+			$(document).bind('mousemove', function (e) {
+				e.preventDefault();
+				if (mouseKeyDown) {
+					var x = e.clientX;
+					if (x < 250) {
+						return false;
+					}
+					colMover.css('left', x);
+					budgetCol.css('width', x);
+				}
+			});
+			
+			colMover.bind('mousedown mouseup', function (e) {
+				mouseKeyDown = e.type === 'mousedown' ? true : false;
+			});
+			
 	    });
 	</script>
 </head>
@@ -52,6 +74,7 @@
 		<input type="submit" value="Go" />
 	</form>
 	<div id="main">
+		<div id="col-mover"></div>
 		<table id="budget">
 			<col id="col1" />
 			<tbody>
