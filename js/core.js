@@ -4,9 +4,6 @@
 			setup: function () {},
 			open: function () {
 				return openDatabase('Budgetter', '0.1', '', 200000);
-			},
-			error: function (err) {
-				console.log(err);
 			}
 		}
 		var _db = db.open();
@@ -22,6 +19,12 @@
 						}
 					}, db.error);
 				});
+			},
+			getDB: function () {
+				return _db;
+			},
+			dbErrorHandler: function (e) {
+				console && console.log(e);
 			},
 			
 			addModule: function (id, module) {
