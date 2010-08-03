@@ -13,10 +13,12 @@
 	 * API */
 	var Budget = function () {	
 		return {
-			newBudget: function (budget_name) {
+			newBudget: function (budget_name) {		
 				db.transaction( function (tx) {
 					tx.executeSql('INSERT INTO budgets (name) VALUES (?)', [budget_name], function (tx, res) {
 						Budget.loadBudget(res.insertId);
+						
+						jQuery.event.trigger('CREATED_NEW_BUDGET');
 					});
 				});
 			},
@@ -85,14 +87,22 @@
 		});
 		
 		var budgetList = $('#budgets');
-		Budget.getBudgets( function (budgets) {
+		
+		var refreshBudgetList = function (budgets) {
 			var html, template = '<li data-budget-id="{id}">{name}</li>';
-
+			
+			budgetList.empty();
+			
 			for (i = 0; i < budgets.length; i++) {
 				html += templateStr( template, { id: budgets[i].id, name: budgets[i].name } );
 			}
 			
 			$( html ).appendTo(budgetList);
+		};
+		
+		Budget.getBudgets( refreshBudgetList );
+		budgetList.bind('CREATED_NEW_BUDGET', function () {
+			Budget.getBudgets( refreshBudgetList );
 		});
 		
 		budgetList.delegate('li', 'click', function (e) {
