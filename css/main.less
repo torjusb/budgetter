@@ -46,12 +46,12 @@ header {
 			top: 1px;
 		}
 		
-		button.left-edge {
+		button:first-of-type {
 			-webkit-border-top-left-radius: 3px;
 			-webkit-border-bottom-left-radius: 3px;
 			border-right: 0;
 		}
-		button.right-edge {
+		button:last-of-type {
 			border-left-color: #888;
 			-webkit-border-top-right-radius: 3px;
 			-webkit-border-bottom-right-radius: 3px;
@@ -61,6 +61,10 @@ header {
 
 #budget {
 	width: 100%;
+	
+	#col1 {
+		width: 250px;
+	}
 	
 	th, td {
 		border-bottom: 1px solid #ddd;
