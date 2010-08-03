@@ -17,13 +17,16 @@
 	    
 	    jQuery( function ($) {
 	    	var Menu = _budgetter.getModule('menu'),
-	    		Budget = _budgetter.getModule('budget');
+	    		Budget = _budgetter.getModule('budget'),
+	    		Modal = _budgetter.getModule('modal');
 
 	    	Menu.setContainer( $('#menuContainer') );
 	    	
 	   		var itemGroup = Menu.addMenuGroup('file');
 			itemGroup.addMenuItem('test2').text('New Budget').click( function () {
-				$('#newBudget').show();
+				Modal.setTitle('Add new budget');
+				Modal.setContent( $('#newBudget') );
+				Modal.show();
 			});
 			
 			itemGroup.addMenuItem('load_budget').text('Load budget').click( function () {
@@ -63,7 +66,7 @@
 	</script>
 </head>
 <body>
-	<header>
+	<header id="header">
 		<h1>Budgetter</h1>
 		<menu id="menuContainer"></menu>
 	</header>
@@ -80,5 +83,6 @@
 			</tbody>
 		</table>
 	</div>
+	<script src="js/modal.js"></script>
 </body>
 </html>

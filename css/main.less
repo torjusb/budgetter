@@ -5,7 +5,7 @@ body {
 	font-family: Helvetica;
 }
 
-header {
+#header {
 	height: 70px;
 	background: -webkit-gradient(linear, left top, left bottom, color-stop(0.0, #224e71), color-stop(0.5, #254c68), color-stop(0.5, #1c4561), to(#204257));
 	border-bottom: 1px solid #000;
@@ -56,6 +56,22 @@ header {
 			-webkit-border-top-right-radius: 3px;
 			-webkit-border-bottom-right-radius: 3px;
 		}
+	}
+}
+
+#modalWrapper {
+	position: absolute;
+	background: #fff;
+	left: 50px;
+	border: 1px solid #888;
+	-webkit-box-shadow: rgba(0, 0, 0, .5) 0 2px 3px, inset rgba(0, 0, 0, .2) 0 0 3px;
+	
+	header {
+		padding: 10px;
+		background: #ddd;
+	}
+	.content {
+		padding: 10px;
 	}
 }
 
