@@ -1,11 +1,127 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<script src="Application/core.js" type="text/javascript" charset="utf-8"></script>
-		<script src="Application/sandbox.js" type="text/javascript" charset="utf-8"></script>
-		<script src="Application/extensions/test.js" type="text/javascript" charset="utf-8"></script>
-		<script src="Application/modules/test.js" type="text/javascript" charset="utf-8"></script>
-	<body>
-		
-	</body>
+<head>
+	<meta charset="utf-8" />
+	<title>Budgetter</title>
+	<link rel="stylesheet/less" href="css/main.less" />
+	<script src="js/less-1.0.33.min.js" type="text/javascript"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+	<script src="js/core.js"></script>
+	<script src="js/budget.js"></script>
+	<script src="js/menu.js"></script>
+	<script type="text/javascript" charset="utf-8">
+	    less.env = "development";
+	    less.watch();
+	    less.poll = 250;
+	    jQuery.event.props.push("dataTransfer");
+	    
+	    jQuery( function ($) {
+	    	var Menu = _budgetter.getModule('menu'),
+	    		Budget = _budgetter.getModule('budget');
+
+	    	Menu.setContainer( $('#menuContainer') );
+	    	
+	   		var itemGroup = Menu.addMenuGroup('file');
+			itemGroup.addMenuItem('test2').text('New Budget').click( function () {
+				$('#newBudget').show();
+			});
+			
+			itemGroup.addMenuItem('load_budget').text('Load budget').click( function () {
+				$('#budgets').show();
+			});
+			
+			$('#newBudget').submit( function (e) {
+				e.preventDefault();
+				
+				var budgetName = $('input[type="text"]', this).val();
+				
+				Budget.newBudget( budgetName );
+			});
+			
+			
+			var colMover = $('#col-mover'),
+				budgetCol = $('#col1'),
+				mouseKeyDown = false;
+			
+			$(document).bind('mousemove', function (e) {
+				if (mouseKeyDown) {
+					e.preventDefault();
+					
+					var x = e.clientX;
+					if (x < 250) {
+						return false;
+					}
+					colMover.css('left', x);
+					budgetCol.css('width', x);
+				}
+			});
+			
+			colMover.bind('mousedown mouseup', function (e) {
+				mouseKeyDown = e.type === 'mousedown' ? true : false;
+			});
+var addEvent = (function () {
+  if (document.addEventListener) {
+    return function (el, type, fn) {
+      if (el && el.nodeName || el === window) {
+        el.addEventListener(type, fn, false);
+      } else if (el && el.length) {
+        for (var i = 0; i < el.length; i++) {
+          addEvent(el[i], type, fn);
+        }
+      }
+    };
+  } else {
+    return function (el, type, fn) {
+      if (el && el.nodeName || el === window) {
+        el.attachEvent('on' + type, function () { return fn.call(el, window.event); });
+      } else if (el && el.length) {
+        for (var i = 0; i < el.length; i++) {
+          addEvent(el[i], type, fn);
+        }
+      }
+    };
+  }
+})();			
+/*
+			setTimeout( function () {
+				addEvent($('tr').get(), 'dragstart', function (e) {
+					console.log(e);
+				});
+			}, 500);
+*/
+
+			$('table').delegate('tr', 'dragstart', function (e) {
+				e.dataTransfer.effectAllowed = 'move';
+				e.dataTransfer.setData('Text', $(this).children('th').attr('data-id'));
+				console.log(e);
+			});
+			$('tbody').bind('dragover dragenter', function (e) {
+				e.preventDefault();
+			});
+			$('tbody').bind('drop', function (e) {
+				console.log(e);
+			});
+		});
+	</script>
+</head>
+<body>
+	<p draggable="true" id="hey">ads</p>
+	<header>
+		<h1>Budgetter</h1>
+		<menu id="menuContainer"></menu>
+	</header>
+	<ul id="budgets" style="display:none;"></ul>
+	<form id="newBudget" style="display:none;">
+		<input type="text" name="budget_name" placeholder="Budget name" />
+		<input type="submit" value="Go" />
+	</form>
+	<div id="main">
+		<div id="col-mover"></div>
+		<table id="budget">
+			<col id="col1" />
+			<tbody>
+			</tbody>
+		</table>
+	</div>
+</body>
 </html>
