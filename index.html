@@ -26,19 +26,11 @@
 
 	    	Menu.setContainer( $('#menuContainer') );
 	    	
-<<<<<<< HEAD
-	   		var itemGroup = Menu.addMenuGroup('file');
-			itemGroup.addMenuItem('test2').text('New Budget').click( function () {
-				Modal.setTitle('Add new budget');
-				Modal.setContent( $('#newBudget') );
-				Modal.show();
-=======
 	   		var fileGroup = Menu.addMenuGroup('budget');
 			fileGroup.addMenuItem('new', {
 				text: 'New budget',
 				modal: true,
 				box: 'newBudget'
->>>>>>> d04e84beb83d4ff902097e5ded4a90d7b0e36800
 			});
 			
 			fileGroup.addMenuItem('load', {
@@ -96,8 +88,6 @@
 			colMover.bind('mousedown mouseup', function (e) {
 				mouseKeyDown = e.type === 'mousedown' ? true : false;
 			});
-<<<<<<< HEAD
-=======
 
 			$('table').delegate('tr', 'dragstart', function (e) {
 				e.dataTransfer.effectAllowed = 'move';
@@ -110,16 +100,11 @@
 			$('tbody').bind('drop', function (e) {
 				console.log(e);
 			});
->>>>>>> d04e84beb83d4ff902097e5ded4a90d7b0e36800
 		});
 	</script>
 </head>
 <body>
-<<<<<<< HEAD
-	<header id="header">
-=======
 	<header id="head">
->>>>>>> d04e84beb83d4ff902097e5ded4a90d7b0e36800
 		<h1>Budgetter</h1>
 		<menu id="menuContainer"></menu>
 	</header>
