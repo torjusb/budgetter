@@ -2,8 +2,9 @@
 
 body {
 	background: #eee;
-	font-family: Helvetica;
+	font-family: Calibri;
 }
+
 
 #header {
 	height: 70px;
@@ -25,53 +26,89 @@ body {
 		list-style: none;
 		margin: 10px;
 		display: block;
-		-webkit-box-shadow: rgba(0, 0, 0, .2) 0 3px 2px;
 		float: left;
-		-webkit-border-radius: 3px;
 		overflow: hidden;
 		margin-top: 20px;
 		margin-left: 100px;
-					
-		button {
-			background: -moz-linear-gradient(top, #fff, blue);
-			background: -webkit-gradient(linear, left top, left bottom, color-stop(0.0, #fff), color-stop(0.1, #f4f4f4), color-stop(0.5, #c3c3c3), color-stop(0.5, #b9b9b9), color-stop(0.9, #b0b0b0));
-			padding: 7px 20px;
-			border: 1px solid #000;
-			margin: 0;
-			float: left;
-			cursor: pointer;
-		}
-		button:active {
-			position: relative;
-			top: 1px;
-		}
 		
-		button:first-of-type {
-			-webkit-border-top-left-radius: 3px;
-			-webkit-border-bottom-left-radius: 3px;
-			border-right: 0;
-		}
-		button:last-of-type {
-			border-left-color: #888;
-			-webkit-border-top-right-radius: 3px;
-			-webkit-border-bottom-right-radius: 3px;
+		li {		
+			float: left;
+			margin-right: 50px;
+			-webkit-box-shadow: rgba(0, 0, 0, .2) 0 3px 2px;
+			-webkit-border-radius: 3px;
+			
+			button {
+				background: -moz-linear-gradient(top, #fff, blue);
+				background: -webkit-gradient(linear, left top, left bottom, color-stop(0.0, #fff), color-stop(0.1, #f4f4f4), color-stop(0.5, #c3c3c3), color-stop(0.5, #b9b9b9), color-stop(0.9, #b0b0b0));
+				padding: 7px 20px;
+				border: 1px solid #000;
+				margin: 0;
+				float: left;
+				cursor: pointer;
+			}
+			button:active {
+				position: relative;
+				top: 1px;
+			}
+			
+			button:first-of-type {
+				-webkit-border-top-left-radius: 3px;
+				-webkit-border-bottom-left-radius: 3px;
+				border-right: 0;
+			}
+			button:last-of-type {
+				border-left-color: #888;
+				-webkit-border-top-right-radius: 3px;
+				-webkit-border-bottom-right-radius: 3px;
+			}
 		}
 	}
 }
 
 #modalWrapper {
 	position: absolute;
-	background: #fff;
-	left: 50px;
-	border: 1px solid #888;
-	-webkit-box-shadow: rgba(0, 0, 0, .5) 0 2px 3px, inset rgba(0, 0, 0, .2) 0 0 3px;
+	width: 400px;
+	background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#eee));
+	border: 1px solid rgba(0, 0, 0, .5);
+	-webkit-box-shadow: rgba(0, 0, 0, .5) 0 3px 5px;
 	
+	p {
+		line-height: 1.4;
+		font-size: 14px;
+	}
 	header {
 		padding: 10px;
-		background: #ddd;
+		border-bottom: 1px solid #D3D3CC;
+		font-size: 30px;
+		color: #fff;
+		text-shadow: rgba(0, 0, 0, .3) -1px -1px 1px;
 	}
 	.content {
 		padding: 10px;
+	}
+
+	.button {
+		background: -webkit-gradient(linear, left top, left bottom, color-stop(0.0, #fff), color-stop(0.1, #f4f4f4), color-stop(0.5, #c3c3c3), color-stop(0.5, #b9b9b9), color-stop(0.9, #b0b0b0));
+		border: 1px solid #888;
+		font-size: 12px;
+		float: right;
+		font-weight: 700;
+		padding: 5px 15px;
+		cursor: pointer;
+		-webkit-border-radius: 15px;
+	}
+	.button.confirm {
+		border-color: #00306D;
+		color: #fff;
+		text-shadow: rgba(0, 0, 0, .2) 0 -2px;
+		-webkit-box-shadow: inset rgb(111, 233, 255, .3) 0 0 5px;
+		background: -webkit-gradient(linear, left top, left bottom, color-stop(0.0, #fff), color-stop(0, #006EF9), color-stop(0.5, #0065E5), color-stop(0.5, #005ACB), color-stop(0.9, #0049A6));
+	}
+	.button:active {
+		position: relative;
+		border-color: #000; 
+		-webkit-box-shadow: inset rgba(0, 0, 0, .3) 0 3px 3px;
+		top: 1px;
 	}
 }
 
