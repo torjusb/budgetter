@@ -4,10 +4,10 @@
 		
 		
 	var templateStr = function (str, data) {
-			return str.replace(/\{([a-zA-Z1-9]+)\}/g, function (match, tag) {
-				return data[tag] || '';
-			});
-		};
+		return str.replace(/\{([a-zA-Z1-9]+)\}/g, function (match, tag) {
+			return data[tag] || '';
+		});
+	};
 			
 	/*
 	 * API */

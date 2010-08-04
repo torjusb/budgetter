@@ -1,44 +1,103 @@
 (function (window) {
 	var Core = _budgetter;
 	
+	var templateStr = function (str, data) {
+		return str.replace(/\{([a-zA-Z1-9]+)\}/g, function (match, tag) {
+			return data[tag] || '';
+		});
+	};
+	
 	var Modal = function () {
-		var _wrapper 	= $('<aside id="modalWrapper" />'),
-			_header 	= $('<header class="header" />').appendTo(_wrapper),
-			_title 		= $('<h1 />').appendTo(_header),
-			_content 	= $('<div class="content" />').appendTo(_wrapper),
-			_cancel		= $('<button class="button cancel">Cancel</button>').appendTo(_wrapper),
-			_confirm	= $('<button class="button confirm">Confirm</button>').appendTo(_wrapper);
+		var _modal 	= $('<aside id="modalWrapper" />'),
+			//_header 	= $('<header class="header" />').appendTo(_modal),
+			//_titleElem	= $('<h1 />').appendTo(_header),
+			_content	= $('<div class="content" />').appendTo(_modal);
 			
-		_wrapper.appendTo('body').hide();
-		
-		var center = function () {
-			var windowWidth = $(document).width(),
-				modalWidth = _wrapper.outerWidth();
+		_modal.appendTo('body').hide();
 				
-			_wrapper.css('left', (windowWidth / 2) - (modalWidth / 2));
+		var textElems = {
+			title: '',
+			caption: '',
+			description: ''
 		};
+				
+		var _center = function () {
+			var windowWidth = $(document).width(),
+				modalWidth = _modal.outerWidth();
+				
+			_modal.css('left', (windowWidth / 2) - (modalWidth / 2));
+		};
+		
+		var _createButtons;
+		(function () {
+			var template = '<button>{name}</button>', html = '';
+			
+			_createButtons = function (buttons) {		
+				$.each(buttons, function (name, callback) {
+					html += templateStr(template, { name: name });
+					this.callback = callback;
+				});
+
+				return ;
+			};
+		})();
+				
+/*
+		_modal.delegate('button', 'click', function (e) {
+			var button = $(this),
+				action = button.attr('data-button-action');
+
+			instance.confirmCallback && instance.confirmCallback(action);
+			
+			Modal.close();
+		});
+*/
 		
 		return {
 			open: function (options) {
-				this.setTitle( options.title );
-				this.setContent( options.content );
+				var content;
+				if (options instanceof jQuery) {
+					content = options;
+				} else {
+					if (options.content instanceof jQuery === false) {
+						content = $( options.content );
+					} else {
+						content = options.content;
+					}
+				}				
+				this.setContent( content.show() );
 				
-				center();
+				_createButtons(options.buttons);
 				
-				_wrapper.fadeIn();
-			},	
+				_center();
+				this.show();
+				
+				return this;
+			},
+			close: function () {
+				instance.confirmCallback = null;
+				
+				return this;
+			},
 			inform: function (content) {
-			
+				
 			},
 			warn: function (content) {
 			
 			},
 			error: function (content) {
-			
+				
+			},
+			confirm: function (msg, callback) {
+				var content = $( templateStr(confirmTmp, { description: msg }) );
+				this.open( content );
+				
+				instance.confirmCallback = callback;
+				return this;
 			},
 			
 			setTitle: function (title) {
-				_title.text( title );
+				_titleElem.text( title );
 				
 				return this;
 			},
@@ -46,6 +105,23 @@
 				_content.html( content );
 				
 				return this;
+			},
+			setCaption: function (caption) {
+				textElems.caption = caption;
+				
+				return this;
+			},
+			setDesciption: function (description) {
+				textElems.description = description;
+				
+				return this;
+			},
+			
+			show: function () {
+				_modal.fadeIn();
+			},
+			hide: function () {
+			
 			}
 		};
 	}();
@@ -53,8 +129,17 @@
 	/* 
 	 * Test */
 	
-	Modal.open( {
-		content:$('<div><p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</div></p>'), title: 'test' } );
+	Modal.open({
+		content: 'asdf',
+		buttons: {
+			'do it': function () {
+				console.log(' do ti');
+			},
+			'do it not': function () {
+				
+			}
+		}
+	});
 	
 	Core.addModule('modal', Modal);
 })(window);
