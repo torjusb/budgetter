@@ -14,6 +14,7 @@
 	<script src="js/core.js"></script>
 	<script src="js/budget.js"></script>
 	<script src="js/menu.js"></script>
+	<script src="application.js"></script>
 	<script type="text/javascript" charset="utf-8">
 	    less.env = "development";
 	    less.watch();
@@ -23,35 +24,8 @@
 	    jQuery( function ($) {
 	    	var Menu = _budgetter.getModule('menu'),
 	    		Budget = _budgetter.getModule('budget'),
-	    		Modal = _budgetter.getModule('modal');
-
-	    	Menu.setContainer( $('#menuContainer') );
-	    	
-	   		var fileGroup = Menu.addMenuGroup('budget');
-			fileGroup.addMenuItem('new', {
-				text: 'New budget',
-				modal: true,
-				box: 'newBudget'
-			});
-			
-			fileGroup.addMenuItem('load', {
-				text: 'Load budget',
-				modal: true,
-				box: 'budgets'
-			});
-			
-			var dbGroup = Menu.addMenuGroup('db');
-			dbGroup.addMenuItem('export', {
-				modal: true,
-				box: 'db',
-				text: 'Export budget'
-			});
-			dbGroup.addMenuItem('import').text('Import budget');
-			
-			var shareGroup = Menu.addMenuGroup('share');
-			shareGroup.addMenuItem('print').text('Print budget');
-			shareGroup.addMenuItem('share').text('Share budget');
-			
+	    		Modal = _budgetter.getModule('modal');		
+/*
 			
 			$( Menu.getContainer ).delegate('button[data-item-modal="true"]', 'click', function () {
 				var pointer = $(this).attr('data-modal-window');
@@ -59,7 +33,9 @@
 					content: $('#' + pointer).clone().show()
 				});
 			});
+*/
 			
+/*
 			$('#newBudget').submit( function (e) {
 				e.preventDefault();
 				
@@ -67,6 +43,7 @@
 				
 				Budget.newBudget( budgetName );
 			});
+*/
 			
 			
 			var colMover = $('#col-mover'),
@@ -113,7 +90,6 @@
 	<div id="db" style="display:none;">adsad</div>
 	<form id="newBudget" style="display:none;">
 		<input type="text" name="budget_name" placeholder="Budget name" />
-		<input type="submit" value="Go" />
 	</form>
 	<div id="main">
 		<div id="col-mover"></div>

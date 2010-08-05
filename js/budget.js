@@ -105,10 +105,12 @@
 			Budget.getBudgets( refreshBudgetList );
 		});
 		
+/*
 		budgetList.delegate('li', 'click', function (e) {
 			Budget.loadBudget( $(this).attr('data-budget-id') );
 			budgetList.hide();
 		});
+*/
 	});
 
 	

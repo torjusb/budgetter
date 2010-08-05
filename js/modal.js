@@ -30,28 +30,26 @@
 		
 		var _createButtons;
 		(function () {
-			var template = '<button>{name}</button>', html = '';
+			var template = '<button class="modalButton {class}">{name}</button>',
+				buttonSet = $('<div class="button-set" />');
 			
-			_createButtons = function (buttons) {		
-				$.each(buttons, function (name, callback) {
-					html += templateStr(template, { name: name });
-					this.callback = callback;
+			_createButtons = function (buttons) {
+				buttonSet.empty();
+				
+				$.each(buttons, function (name, meta) {
+					var button = $('<button />', {
+						text: name,
+						click: meta.callback,
+						'class': 'modal-button ' + meta.class
+					});
+					
+					button.appendTo(buttonSet);					
 				});
+				
 
-				return ;
+				return buttonSet;
 			};
 		})();
-				
-/*
-		_modal.delegate('button', 'click', function (e) {
-			var button = $(this),
-				action = button.attr('data-button-action');
-
-			instance.confirmCallback && instance.confirmCallback(action);
-			
-			Modal.close();
-		});
-*/
 		
 		return {
 			open: function (options) {
@@ -67,7 +65,10 @@
 				}				
 				this.setContent( content.show() );
 				
-				_createButtons(options.buttons);
+				if (options.buttons) {
+					var buttons = _createButtons(options.buttons);
+					buttons.appendTo(_modal);
+				}
 				
 				_center();
 				this.show();
@@ -75,7 +76,8 @@
 				return this;
 			},
 			close: function () {
-				instance.confirmCallback = null;
+				_content.empty();
+				_modal.fadeOut();
 				
 				return this;
 			},
@@ -121,7 +123,7 @@
 				_modal.fadeIn();
 			},
 			hide: function () {
-			
+				
 			}
 		};
 	}();
@@ -129,17 +131,25 @@
 	/* 
 	 * Test */
 	
+/*
 	Modal.open({
 		content: 'asdf',
 		buttons: {
-			'do it': function () {
-				console.log(' do ti');
+			'Cancel': {
+				'class': 'cancel',
+				callback: function (e) {
+					Modal.close();
+				}
 			},
-			'do it not': function () {
-				
+			'Confirm': {
+				'class': 'confirm',
+				callback: function (e) {
+					console.log('confirm');
+				}
 			}
 		}
 	});
+*/
 	
 	Core.addModule('modal', Modal);
 })(window);
