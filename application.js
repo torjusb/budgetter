@@ -38,10 +38,15 @@ jQuery( function ($) {
 		});
 	});
 	
-	$('#budgets').delegate('li', 'click', function () {
+	var budgets = $('#budgets');
+	budgets.delegate('li', 'click', function () {
 		var item = $(this);
 		
+		$('#modalWrapper').find('.confirm').removeAttr('disabled');
+		
 		item.siblings().removeClass('selected').end().addClass('selected');
+	}).bind('MODAL_WINDOW_CLOSED', function () {
+		budgets.find('li').removeClass('selected');
 	});
 	fileGroup.addMenuItem('load', {
 		text: 'Load budget'
@@ -51,14 +56,16 @@ jQuery( function ($) {
 			buttons: {
 				'Open': {
 					class: 'confirm',
-					disabled: true, // Work
-					callback: function () {
-					
+					disabled: true,
+					callback: function () {					
+						Budget.loadBudget( budgets.find('li.selected').attr('data-budget-id') );
+						
+						Modal.close();
 					}
 				},
 				'Cancel': {
 					callback: function () {
-						
+						Modal.close()
 					}
 				}				
 			}

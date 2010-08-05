@@ -14,12 +14,9 @@
 			_content	= $('<div class="content" />').appendTo(_modal);
 			
 		_modal.appendTo('body').hide();
+		
+		var _modalContent;
 				
-		var textElems = {
-			title: '',
-			caption: '',
-			description: ''
-		};
 				
 		var _center = function () {
 			var windowWidth = $(document).width(),
@@ -39,6 +36,7 @@
 				$.each(buttons, function (name, meta) {
 					var button = $('<button />', {
 						text: name,
+						disabled: meta.disabled,
 						click: meta.callback,
 						'class': 'modal-button ' + meta.class
 					});
@@ -64,6 +62,7 @@
 					}
 				}				
 				this.setContent( content.show() );
+				_modalContent = content;
 				
 				if (options.buttons) {
 					var buttons = _createButtons(options.buttons);
@@ -76,8 +75,11 @@
 				return this;
 			},
 			close: function () {
-				_content.empty();
-				_modal.fadeOut();
+				_modal.fadeOut(300, function () {
+					_modalContent.trigger('MODAL_WINDOW_CLOSED').appendTo('#settingsWrap');
+					_modalContent = null;
+					_content.empty();
+				});
 				
 				return this;
 			},
