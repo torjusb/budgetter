@@ -101,34 +101,48 @@
 					<input type="submit" value="Add" />
 				</form>
 			</nav>
+			<nav>
+				<li>Trashcan</li>
+				<li>Logbook</li>
+			</nav>
 		</div>
 		<div id="right">
-			<div id="budgetInfo">
-				<h1 contenteditable>Budget name</h1>
-				<p class="description" contenteditable>Description</p>
+			<div id="budgetView" class="view">
+				<div id="budgetInfo">
+					<h1 contenteditable>Budget name</h1>
+					<p class="description" contenteditable>Description</p>
+				</div>
+				<form id="newCalculation">
+					<input type="text" name="calculation" placeholder="Add expense" />
+					<input type="submit" value="Add" />
+				</form>
+				<div class="budget-wrap">
+					<table id="budget">
+						<colgroup>
+							<col id="col1" />
+						</colgroup>
+						<tfoot>
+							<tr>
+								<th>Total</th>
+								<td id="totalAmount"></td>
+							</tr>
+						</tfoot>
+						<tbody>
+						</tbody>
+					</table>
+				</div>
+				<div id="totalFixed">
+					<p class="label">Total</p>
+					<p class="amount">1337</p>
+				</div>
 			</div>
-			<form id="newCalculation">
-				<input type="text" name="calculation" placeholder="Add expense" />
-				<input type="submit" value="Add" />
-			</form>
-			<div class="budget-wrap">
-				<table id="budget">
-					<colgroup>
-						<col id="col1" />
-					</colgroup>
-					<tfoot>
-						<tr>
-							<th>Total</th>
-							<td id="totalAmount"></td>
-						</tr>
-					</tfoot>
-					<tbody>
-					</tbody>
-				</table>
+			
+			<div id="logbookView" class="view">
+				
 			</div>
-			<div id="totalFixed">
-				<p class="label">Total</p>
-				<p class="amount">1337</p>
+			
+			<div id="trashView" class="view">
+				
 			</div>
 		</div>
 	</div>
@@ -138,6 +152,7 @@
 	</div>
 	<menu id="contextMenu" type="context">
 		<li data-menu-action="rename"><span>Rename</span></li>
+		<li data-menu-action="log"><span>Log budget</span></li>
 		<li data-menu-action="delete"><span>Delete</span></li>
 	</menu>
 	<script src="js/modal.js"></script>

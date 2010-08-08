@@ -53,16 +53,24 @@ jQuery( function ($) {
 			
 			contextMenu.delegate('li', 'click', function () {
 				var elem = $(this),
-					action = elem.attr('data-menu-action');
+					action = elem.attr('data-menu-action'),
+					menuElem = budgetList.find('li[data-budget-id="' + budgetId + '"]');
 					
 					
 				switch (action) {
 					case 'rename':
-						
+						menuElem.attr('contenteditable', true).focus();	
+						break;
 					case 'delete':
-						var menuElem = budgetList.find('li[data-budget-id="' + budgetId + '"]');
-						
-						menuElem.attr('contenteditable', true).focus();
+						Budget.removeBudget(budgetId, function () {
+							Budget.getBudgets( refreshBudgetList );
+						});
+						break;
+					case 'log':
+						Budget.logBudget(budgetId, function () {
+							Budget.getBudgets( refreshBudgetList );
+						});
+						break;
 				}
 				
 				contextMenu.hide();
@@ -384,5 +392,11 @@ jQuery( function ($) {
 	 			}
 	 		}).disableSelection();
 	 	});
+	 })();
+	 
+	 /*
+	  * Logbook view */
+	 ( function () {
+	 	
 	 })();
 });

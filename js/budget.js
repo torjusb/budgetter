@@ -44,7 +44,7 @@
 			},
 			getBudgets: function (callback) {
 				db.transaction( function (tx) {		
-					tx.executeSql('SELECT * FROM budgets', [], function (tx, res) {
+					tx.executeSql('SELECT * FROM budgets WHERE status = "active"', [], function (tx, res) {
 						var budgets = {};
 						
 						for (i = 0; i < res.rows.length; i++) {
@@ -76,6 +76,24 @@
 						budgetTable.append( html );
 						
 						jQuery.event.trigger('BUDGET_LOADED', {budget_id: budget_id});
+					});
+				});
+			},
+			removeBudget: function (budget_id, callback) {
+				budget_id = budget_id || loadedBudget;
+				
+				db.transaction( function (tx) {
+					tx.executeSql('UPDATE budgets SET status = "deleted" WHERE id = ?', [budget_id], function (tx, res) {
+						callback && callback(res);
+					});
+				});
+			},
+			logBudget: function (budget_id, callback) {
+				budget_id = budget_id || loadedBudget;
+				
+				db.transaction( function (tx) {
+					tx.executeSql('UPDATE budgets SET status = "logged" WHERE id = ?', [budget_id], function (tx, res) {
+						callback && callback(res);
 					});
 				});
 			},
