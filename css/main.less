@@ -317,12 +317,15 @@ input[type="submit"] {
 		.budget-wrap {
 			height: 300px;
 			overflow-y: scroll;
+			position: relative;
 			
 			#budget {
 				width: 100%;
 				
 				#col1 {
-					width: 250px;
+					width: 300px;
+					min-width: 200px;
+					max-width: 400px;
 				}
 				
 				th, td {
@@ -342,6 +345,16 @@ input[type="submit"] {
 				
 				tfoot { display: none; }
 			}
+			
+			#budget-col-sizer {
+				position: absolute;
+				height: 100%;
+				width: 1px;
+				background: #888;
+				top: 0;
+				left: 300px;
+				cursor: col-resize;
+			}
 		}
 		
 		#totalFixed {
@@ -359,12 +372,14 @@ input[type="submit"] {
 			p {
 				float: left;
 				padding: 0 10px;
-				width: 200px;
 				line-height: 30px;
 				
 				&:first-of-type {
 					text-align: right;
+					margin-left: 1px;
+					width: 300px;
 					border-right: 1px solid #888;
+					-webkit-box-sizing: border-box;
 				}
 			}
 		}

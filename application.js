@@ -209,17 +209,34 @@ jQuery( function ($) {
 	 ( function () {
 	 	var left = $('#left'),
 	 		right = $('#right'),
-	 		colSizer = $('<div id="col-sizer" />').appendTo(left),
+	 		leftColSizer = $('<div id="col-sizer" />').appendTo(left),
 	 		
-	 		min = parseFloat(left.css('minWidth')),
-	 		max = parseFloat(left.css('maxWidth')),
+	 		budgetCol = $('#col1'),
+	 		totalLabel = $('#totalFixed').find('.label'),
+	 		budgetColSizer = $('<div id="budget-col-sizer" />').appendTo('div.budget-wrap', right),
+	 		
+	 		leftValues = {
+	 			min: parseFloat(left.css('minWidth')),
+		 		max: parseFloat(left.css('maxWidth')),
+		 		savedWidth: parseFloat(localStorage.getItem('col-width'))
+		 	},
+		 	budgetValues = {
+		 		min: parseFloat(budgetCol.css('minWidth')),
+		 		max: parseFloat(budgetCol.css('maxWidth')),
+		 		savedWidth: parseFloat(localStorage.getItem('budget-col-width'))
+		 	},
+		 	
 	 		mouseKeyDown = false,
-	 		
-	 		savedWidth = parseFloat(localStorage.getItem('col-width'));
-	 	
-	 	if (savedWidth) {
-	 		left.width(savedWidth);
- 			right.css('marginLeft', savedWidth);
+	 		movingCol;
+
+
+	 	if (leftValues.savedWidth) {
+	 		left.width(leftValues.savedWidth);
+ 			right.css('marginLeft', leftValues.savedWidth);
+	 	}
+	 	if (budgetValues.savedWidth) {
+	 		budgetCol.add(totalLabel).width(budgetValues.savedWidth);
+ 			budgetColSizer.css('left', budgetValues.savedWidth);
 	 	}
 	 			 		
 	 	$(document).bind('mousemove mouseup', function (e) { 		
@@ -227,25 +244,41 @@ jQuery( function ($) {
 	 			e.preventDefault();	 			 			
 	 			
 	 			var x = e.clientX;
-	 			
-	 			if (x <= min || x >= max) {
-	 				return false;
-	 			}
-	 			
-	 			left.width(x);
-	 			right.css('marginLeft', x);
+
+	 			if (movingCol === 'left') {
+		 			if (x <= leftValues.min || x >= leftValues.max) {
+		 				return false;
+		 			}
+		 			
+		 			left.width(x);
+		 			right.css('marginLeft', x);
+		 		} else if (movingCol === 'budget') {
+		 			x -= left.width();
+		 			
+		 			if (x <= budgetValues.min || x >= budgetValues.max) {
+		 				return false;
+		 			}
+		 			
+		 			budgetCol.add(totalLabel).width(x);
+		 			budgetColSizer.css('left', x);
+		 		}
 	 		}
 	 		
 	 		if (e.type === 'mouseup') {
+	 			localStorage.setItem('budget-col-width', totalLabel.width());
 	 			localStorage.setItem('col-width', left.width());
 	 			mouseKeyDown = false;
 	 		}
 	 	});
 	 	
-	 	colSizer.bind('mousedown mouseup', function (e) {
+	 	leftColSizer.bind('mousedown mouseup', function (e) {
+	 		movingCol = 'left';
 			mouseKeyDown = e.type === 'mousedown' ? true : false;
 		});
-	 		 	
+		budgetColSizer.bind('mousedown mouseup', function (e) {
+			movingCol = 'budget';
+			mouseKeyDown = e.type === 'mousedown' ? true : false;
+		});	 	
 	 })();
 	 
 	 /*
