@@ -31,6 +31,8 @@
 				
 				db.transaction( function (tx) {
 					tx.executeSql('INSERT INTO lines (budget_id, text, line_number, type) VALUES (?, ?, 1, "normal")', [budget_id, text]);
+					
+					jQuery.event.trigger('LINE_ADDED');
 				});
 			},
 			updateLine: function (text, budget_id) {
@@ -128,6 +130,16 @@
 				}
 
 				return 0;
+			},
+			getTotal: function () {
+				var total = 0,
+					numberCol = $('#budget tbody').find('td');
+
+				numberCol.each( function () {
+					total += parseFloat( $(this).text() );
+				});
+				
+				return total;
 			}
 		};
 	}();

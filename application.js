@@ -5,21 +5,111 @@ jQuery( function ($) {
 		Modal	= _budgetter.getModule('modal'),
 		Menu	= _budgetter.getModule('menu');
 	 
-	 
-	 Budget.addCalculation(0, /\d+/, function (string, regex) {
-	 	return parseFloat(string.match(regex));
-	 });
-	 Budget.addCalculation(50, /(\d+).*\sa\s(\d+)/, function (string, regex) {
+	Budget.addCalculation(0, /\d+/, function (string, regex) {
+		return parseFloat(string.match(regex));
+	});
+	Budget.addCalculation(50, /(\d+).*\sa\s(\d+)/, function (string, regex) {
 	 	var matches = string.match(regex);
 	 	
 	 	return parseFloat(matches[1] * matches[2]);
-	 });		
+	});
+	Budget.addCalculation(50, /m\((.+)\)/, function (string, regex) {
+	 	var equation = string.match(regex)[1];
+	 	
+	 	return Parser.parse( equation ).evaluate();
+	});
 	
 	var templateStr = function (str, data) {
 		return str.replace(/\{([a-zA-Z1-9]+)\}/g, function (match, tag) {
 			return data[tag] || '';
 		});
 	};
+	
+	( function () {
+	 	var budgetList = $('#budgets');
+	
+		var refreshBudgetList = function (budgets) {
+			var html, template = '<li data-budget-id="{id}">{name}</li>';
+			
+			budgetList.empty();
+			
+			for (i = 0; i < budgets.length; i++) {
+				html += templateStr( template, { id: budgets[i].id, name: budgets[i].name } );
+			}
+			
+			$( html ).appendTo(budgetList);
+			
+			Budget.loadBudget( localStorage.getItem('loadedBudget') || 1 );
+		};
+		
+		$(document).bind('click', function (e) {
+			$('#contextMenu').hide();
+		});
+		
+		var openContextMenu = function (e, budget_id) {
+			var contextMenu = $('#contextMenu'), budgetId;
+			
+			contextMenu.delegate('li', 'click', function () {
+				var elem = $(this),
+					action = elem.attr('data-menu-action');
+					
+					
+				switch (action) {
+					case 'rename':
+						
+					case 'delete':
+						var menuElem = budgetList.find('li[data-budget-id="' + budgetId + '"]');
+						
+						menuElem.attr('contenteditable', true).focus();
+				}
+				
+				contextMenu.hide();
+			});
+			
+			return function (e, budget_id) {
+				e.preventDefault();
+				
+				budgetId = budget_id;
+				
+				contextMenu.css({
+					top: e.pageY,
+					left: e.pageX
+				}).show();
+			}
+		}();
+		
+		
+		budgetList.bind('CREATED_NEW_BUDGET', function () {
+			Budget.getBudgets( refreshBudgetList );
+		});
+		Budget.getBudgets( refreshBudgetList );
+		budgetList.delegate('li', 'click contextmenu focusout keydown', function (e) {
+			var elem = $(this),
+				budgetId = elem.attr('data-budget-id'),
+				contextMenu;
+
+			switch (e.type) {
+				case 'click':
+					Budget.loadBudget( elem.attr('data-budget-id') );
+					break;
+				case 'contextmenu':
+					openContextMenu(e, elem.attr('data-budget-id'));
+					break;
+				case 'focusout':
+					elem.removeAttr('contenteditable');
+					Budget.setTitle( elem.text(), budgetId );
+					break;
+				case 'keydown':
+					if (e.keyCode === 13) { // enter
+						e.preventDefault();
+						elem.blur();
+					}
+					break;
+			}
+		}).bind('BUDGET_LOADED', function (e, data) {
+			budgetList.find('li').removeClass('selected').filter('[data-budget-id="' + data.budget_id + '"]').addClass('selected');
+		});
+	})();
 	
 	/*
 	 * Budget info functionality */
@@ -159,6 +249,13 @@ jQuery( function ($) {
 	 })();
 	 
 	 /*
+	  * Budget col-resizer */
+	 (function () {
+	 	var col = $('#col1'),
+	 		totalLabel = $('#totalFixed').find('.label');
+	 })();
+	 
+	 /*
 	  * Table height  TODO: Move to window mangagment? */
 	 ( function () {
 	 	var budgetBox = $('div.budget-wrap'),
@@ -168,10 +265,10 @@ jQuery( function ($) {
 	 		offset = budgetBox.offset().top,
 	 		docHeight = doc.height();
 	 		 	
-	 	budgetBox.height(docHeight - offset + 3);
+	 	budgetBox.height(docHeight - offset + 3  - $('#totalFixed').outerHeight());
 	 	
 	 	win.bind('resize', function (e) {
-	 		budgetBox.height(win.height() - offset + 3); // TODO: Figure out if I need to hardcore 3
+	 		budgetBox.height((win.height() - offset + 3) - $('#totalFixed').outerHeight()); // TODO: Figure out if I need to hardcore 3
 	 	});
 	 })();
 	 
@@ -196,47 +293,14 @@ jQuery( function ($) {
 	 	});
 	 })();
 	 
-	 
- 	var budgetList = $('#budgets');
-	
-	var refreshBudgetList = function (budgets) {
-		var html, template = '<li data-budget-id="{id}">{name}</li>';
-		
-		budgetList.empty();
-		
-		for (i = 0; i < budgets.length; i++) {
-			html += templateStr( template, { id: budgets[i].id, name: budgets[i].name } );
-		}
-		
-		$( html ).appendTo(budgetList);
-		
-		Budget.loadBudget( localStorage.getItem('loadedBudget') || 1 );
-	};
-	
-	Budget.getBudgets( refreshBudgetList );
-	budgetList.bind('CREATED_NEW_BUDGET', function () {
-		Budget.getBudgets( refreshBudgetList );
-	});
-
-	budgetList.delegate('li', 'click contextmenu', function (e) {
-		e.preventDefault();
-		var elem = $(this),
-			budgetId = elem.attr('data-budget-id'),
-			contextMenu;
-		console.log(e);
-		switch (e.type) {
-			case 'click':
-				Budget.loadBudget( elem.attr('data-budget-id') );
-			case 'contextmenu':
-				e.preventDefault();
-				contextMenu = $('#contextMenu');
-				
-				contextMenu.css({
-					top: e.pageY,
-					left: e.pageX
-				});
-		}
-	}).bind('BUDGET_LOADED', function (e, data) {
-		budgetList.find('li').removeClass('selected').filter('[data-budget-id="' + data.budget_id + '"]').addClass('selected');
-	});
+	 /*
+	  * Total amount update */
+	 (function () {
+	 	var totalTable = $('#totalAmount'),
+	 		totalFixed = $('#totalFixed').find('.amount');
+	 	
+	 	totalTable.bind('BUDGET_LOADED LINE_ADDED', function () {
+	 		totalTable.add(totalFixed).text( Budget.getTotal() );
+	 	});
+	 })();
 });

@@ -12,6 +12,7 @@
 	<script src="fancybox/jquery.fancybox-1.3.1.js"></script>
 	<link href="fancybox/jquery.fancybox-1.3.1.css" rel="stylesheet" />
 -->
+	<script src="js/math-string-parser.js"></script>
 	<script src="js/core.js"></script>
 	<script src="js/budget.js"></script>
 	<script src="js/menu.js"></script>
@@ -112,9 +113,19 @@
 			<div class="budget-wrap">
 				<table id="budget">
 					<col id="col1" />
+					<tfoot>
+						<tr>
+							<th>Total</th>
+							<td id="totalAmount"></td>
+						</tr>
+					</tfoot>
 					<tbody>
 					</tbody>
 				</table>
+			</div>
+			<div id="totalFixed">
+				<p class="label">Total</p>
+				<p class="amount">1337</p>
 			</div>
 		</div>
 	</div>
@@ -123,8 +134,8 @@
 		<form id="newBudget" style="display:none;"><input type="text" name="budget_name" placeholder="Budget name" /></form>
 	</div>
 	<menu id="contextMenu" type="context">
-		<li><span>Rename</span></li>
-		<li><span>Delete</span></li>
+		<li data-menu-action="rename"><span>Rename</span></li>
+		<li data-menu-action="delete"><span>Delete</span></li>
 	</menu>
 	<script src="js/modal.js"></script>
 </body>
