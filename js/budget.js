@@ -36,8 +36,10 @@
 				});
 			},
 			updateLine: function (text, budget_id) {
+				budget_id = budget_id || loadedBudget;
+				
 				db.transaction( function (tx) {
-					tx.executeSql('UPDATE lines SET text = ? WHERE budget_id = ?', [text, budget_it]);
+					tx.executeSql('UPDATE lines SET text = ? WHERE budget_id = ?', [text, budget_id]);
 				});
 			},
 			getBudgets: function (callback) {

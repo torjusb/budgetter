@@ -25,10 +25,12 @@ jQuery( function ($) {
 		});
 	};
 	
+	/*
+	 * Budget navigation */
 	( function () {
-	 	var budgetList = $('#budgets');
+	 	var budgetList = $('#budgets'),
 	
-		var refreshBudgetList = function (budgets) {
+		refreshBudgetList = function (budgets) {
 			var html, template = '<li data-budget-id="{id}">{name}</li>';
 			
 			budgetList.empty();
@@ -281,12 +283,6 @@ jQuery( function ($) {
 		});	 	
 	 })();
 	 
-	 /*
-	  * Budget col-resizer */
-	 (function () {
-	 	var col = $('#col1'),
-	 		totalLabel = $('#totalFixed').find('.label');
-	 })();
 	 
 	 /*
 	  * Table height  TODO: Move to window mangagment? */
@@ -334,6 +330,29 @@ jQuery( function ($) {
 	 	
 	 	totalTable.bind('BUDGET_LOADED LINE_ADDED', function () {
 	 		totalTable.add(totalFixed).text( Budget.getTotal() );
+	 	});
+	 })();
+	 
+	 /*
+	  * Edit budget lines */
+	 ( function () {
+	 	var budget = $('#budget');
+
+	 	budget.delegate('th', 'keydown focusout', function (e) {
+	 		var elem = $(this),
+	 			value = elem.text();
+	 			 		
+	 		switch (e.type) {
+	 			case 'focusout':
+	 				Budget.updateLine( value );
+	 				break;
+	 			case 'keydown':
+	 				if (e.keyCode === 13 && !e.shiftKey) {
+	 					e.preventDefault();
+	 					elem.blur();
+	 				}
+	 				break;
+	 		}
 	 	});
 	 })();
 });
