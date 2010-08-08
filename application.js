@@ -355,4 +355,34 @@ jQuery( function ($) {
 	 		}
 	 	});
 	 })();
+	 
+	 /*
+	  * UI Sortable */
+	 (function () {
+		var fixHelper = function(e, ui) {
+			ui.children().each( function() {
+				var elem = $(this);
+				elem.width( elem.width() );
+			});
+			
+			return ui;
+		};
+
+	 	$('#budget').bind('BUDGET_LOADED', function () {
+	 		$('#budget').find('tbody').sortable({
+	 			helper: fixHelper,
+	 			axis: 'y',
+	 			
+	 			start: function (e, ui) {
+	 				console.log('start', ui.item.siblings().css('background', 'blue'));
+	 			},
+	 			sort: function (e, ui) {
+	 				console.log('upadte', ui);
+	 			},
+	 			stop: function (e, ui) {
+	 				console.log('stop', ui);
+	 			}
+	 		}).disableSelection();
+	 	});
+	 })();
 });

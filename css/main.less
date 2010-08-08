@@ -316,7 +316,7 @@ input[type="submit"] {
 		
 		.budget-wrap {
 			height: 300px;
-			overflow-y: scroll;
+			overflow-y: auto;
 			position: relative;
 			
 			#budget {
@@ -336,11 +336,15 @@ input[type="submit"] {
 					vertical-align: top;
 					padding: 5px 10px;
 				}
+				tbody {
+					cursor: move;
+				}
 				
 				tbody th {
 					width: 150px;
 					text-align: right;
 					border-right: 1px solid #888;
+					cursor: text!important;
 				}
 				
 				tfoot { display: none; }
