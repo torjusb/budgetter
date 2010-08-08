@@ -11,7 +11,11 @@
 			
 	/*
 	 * API */
-	var Budget = function () {	
+	var Budget = function () {
+		var loadedBudget = localStorage.getItem('loadedBudget'),
+		
+			calculations = [];
+		
 		return {
 			newBudget: function (budget_name) {		
 				db.transaction( function (tx) {
@@ -22,9 +26,11 @@
 					});
 				});
 			},
-			addLine: function (text) {
+			addLine: function (text, budget_id) {
+				budget_id = budget_id || loadedBudget;
+				
 				db.transaction( function (tx) {
-					tx.executeSql('INSERT INTO lines (budget_id, text, line_number, type) VALUES (?, ?, 1, "normal")', [localStorage.getItem('loadedBudget'), text]);
+					tx.executeSql('INSERT INTO lines (budget_id, text, line_number, type) VALUES (?, ?, 1, "normal")', [budget_id, text]);
 				});
 			},
 			updateLine: function (text, budget_id) {
@@ -48,22 +54,80 @@
 			},
 			loadBudget: function (budget_id) {
 				localStorage.setItem('loadedBudget', budget_id);
+				loadedBudget = budget_id;
 				
-				$('#budget').find('tbody').empty();
+				var budgetTable = $('#budget').find('tbody').empty();
 				
 				db.transaction( function (tx) {
 					tx.executeSql('SELECT * FROM lines JOIN budgets ON lines.budget_id = budgets.id WHERE budget_id = ?', [budget_id], function (tx, result) {
 						var html = '';
-		
-						for (i = 0; i < result.rows.length; i++) {
-							var row = result.rows.item(i);
-							html = html + '<tr><th contenteditable data-is-new="0" data-id="' + row.id + '">' + row.text + '</th><td>asdf</td></tr>';
-						};
-						html += '<tr><th contenteditable data-is-new="1"></th><td></td></tr>';
 						
-						$('#budget').find('tbody').append( html );
+						for (i = 0; i < result.rows.length; i++) {
+							var row = result.rows.item(i),
+								expense = Budget.parseExpense( row.text );
+								
+							html = html + '<tr><th contenteditable data-id="' + row.id + '">' + row.text + '</th><td>' + expense + '</td></tr>';
+						};
+						
+						budgetTable.append( html );
+						
+						jQuery.event.trigger('BUDGET_LOADED', {budget_id: budget_id});
 					});
 				});
+			},
+			setDescription: function (description, budget_id) {
+				budget_id = budget_id || loadedBudget;
+				
+				db.transaction( function (tx) {
+					tx.executeSql('UPDATE budgets SET description = ? WHERE id = ?', [description, budget_id]);
+				});
+			},
+			getDescription: function (callback, budget_id) {
+				budget_id = budget_id || loadedBudget;
+				
+				db.transaction( function (tx) {
+					tx.executeSql('SELECT description FROM budgets WHERE id = ?', [budget_id], function (tx, res) {
+						callback(res.rows.item(0).description);
+					});
+				}, Core.dbErrorHandler);
+			},
+			setTitle: function (title, budget_id) {
+				budget_id = budget_id || loadedBudget;
+				
+				db.transaction( function (tx) {
+					tx.executeSql('UPDATE budgets SET name = ? WHERE id = ?', [title, budget_id]);
+				});
+			},
+			getTitle: function (callback, budget_id) {
+				budget_id = budget_id || loadedBudget;
+				
+				db.transaction( function (tx) {
+					tx.executeSql('SELECT name FROM budgets WHERE id = ?', [budget_id], function (tx, res) {
+						callback(res.rows.item(0).name);
+					});
+				}, Core.dbErrorHandler);
+			},
+			addCalculation: function (priority, regex, fn) {
+				var obj = {
+					priority: priority,
+					match: regex,
+					calculate: fn
+				};
+				
+				calculations.push(obj);
+				calculations.sort( function (a, b) {
+					return a.priority < b.priority;
+				});
+			},
+			parseExpense: function (text) {
+				for (y = 0; y < calculations.length; y++) {
+					var cal = calculations[y];
+					if (cal.match.test(text)) {
+						return cal.calculate(text, cal.match);
+					}
+				}
+
+				return 0;
 			}
 		};
 	}();
@@ -86,35 +150,9 @@
 			}			
 		});
 		
-		var budgetList = $('#budgets');
-		
-		var refreshBudgetList = function (budgets) {
-			var html, template = '<li data-budget-id="{id}">{name}</li>';
-			
-			budgetList.empty();
-			
-			for (i = 0; i < budgets.length; i++) {
-				html += templateStr( template, { id: budgets[i].id, name: budgets[i].name } );
-			}
-			
-			$( html ).appendTo(budgetList);
-		};
-		
-		Budget.getBudgets( refreshBudgetList );
-		budgetList.bind('CREATED_NEW_BUDGET', function () {
-			Budget.getBudgets( refreshBudgetList );
-		});
-		
-/*
-		budgetList.delegate('li', 'click', function (e) {
-			Budget.loadBudget( $(this).attr('data-budget-id') );
-			budgetList.hide();
-		});
-*/
-	});
 
+	});
 	
-	Budget.loadBudget( localStorage.getItem('loadedBudget') || 1 );
 	
 	Core.addModule('budget', Budget); 
 })(window);

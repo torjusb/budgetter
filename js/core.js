@@ -3,12 +3,11 @@
 		var db = {
 			setup: function () {},
 			open: function () {
-				return openDatabase('Budgetter', '0.1', '', 200000);
+				return window.openDatabase('Budgetter', '0.1', '', 200000);
 			}
-		}
-		var _db = db.open();
-		
-		var modules = {};
+		},
+		_db = db.open(),
+		modules = {};
 		
 		return {
 			executeSql: function (sql, data, callback) {

@@ -85,3 +85,6 @@ input, select {
     vertical-align: middle;
     font-family: inherit;
 }
+input, textarea {
+	font-family: inherit;
+}
