@@ -54,9 +54,9 @@ jQuery( function ($) {
 			contextMenu.delegate('li', 'click', function () {
 				var elem = $(this),
 					action = elem.attr('data-menu-action'),
-					menuElem = budgetList.find('li[data-budget-id="' + budgetId + '"]');
-					
-					
+					menuElem = budgetList.find('li[data-budget-id="' + budgetId + '"]'),
+					loadNewBudgetId = parseInt(menuElem.prev().attr('data-budget-id') || menuElem.next().attr('data-budget-id'));
+
 				switch (action) {
 					case 'rename':
 						menuElem.attr('contenteditable', true).focus();	
@@ -64,11 +64,13 @@ jQuery( function ($) {
 					case 'delete':
 						Budget.removeBudget(budgetId, function () {
 							Budget.getBudgets( refreshBudgetList );
+							Budget.loadBudget( loadNewBudgetId );
 						});
 						break;
 					case 'log':
 						Budget.logBudget(budgetId, function () {
 							Budget.getBudgets( refreshBudgetList );
+							Budget.loadBudget( loadNewBudgetId );
 						});
 						break;
 				}
@@ -190,27 +192,29 @@ jQuery( function ($) {
 	 * Add calculation */
 	( function () {
 		var newCalcForm = $('#newCalculation'),
+			budgetTable = $('#budget');
 		
-			addRow = function (text) {
-				var template = '<tr><th contenteditable>{text}</th><td>{calcRes}</td></tr>',
-					budgetTbody = $('#budget').find('tbody');
+		budgetTable.find('tbody').bind('LINE_ADDED', function (e, data) {
+			var tbody = $(this),
+				template = '<tr><th contenteditable data-id="{id}">{text}</th><td>{calcRes}</td></tr>',
 				
-				return function (text) {
-					var res = Budget.parseExpense(text);
-					budgetTbody.append( $(templateStr(template, { text: text, calcRes: res })) );
-					Budget.addLine( text );
-				}
-			}();
+				res = Budget.parseExpense(data.text);
+			
+			var elem = $(templateStr(template, { id: data.newId, text: data.text, calcRes: res }));
+			tbody.append( elem );
+			elem.children('th').attr('data-parent-id', elem.prev().children('th').attr('data-id') || 0);
+		});
 		
 		newCalcForm.bind('submit', function (e) {
 			e.preventDefault();
 			
 			var calcField = $(this).find('input[name="calculation"]'),
-				value = calcField.val();
+				value = calcField.val(),
+				parId = $('tbody', budgetTable).find('tr:last th').attr('data-id') || 0;
 							
 			calcField.val('');
 			
-			addRow( value );
+			Budget.addLine( value, parId );
 		});
 	})();
 	
@@ -273,17 +277,19 @@ jQuery( function ($) {
 		 			budgetColSizer.css('left', x);
 		 		}
 	 		}
-	 		
-	 		if (e.type === 'mouseup') {
+			
+	 		if (e.type === 'mouseup' && movingCol) {
+	 			console.log('save');
 	 			localStorage.setItem('budget-col-width', totalLabel.width());
 	 			localStorage.setItem('col-width', left.width());
-	 			mouseKeyDown = false;
+	 			mouseKeyDown = movingCol = false;
 	 		}
 	 	});
 	 	
 	 	leftColSizer.bind('mousedown mouseup', function (e) {
 	 		movingCol = 'left';
 			mouseKeyDown = e.type === 'mousedown' ? true : false;
+			
 		});
 		budgetColSizer.bind('mousedown mouseup', function (e) {
 			movingCol = 'budget';
@@ -352,7 +358,7 @@ jQuery( function ($) {
 	 			 		
 	 		switch (e.type) {
 	 			case 'focusout':
-	 				Budget.updateLine( value );
+	 				Budget.updateLine( value, elem.attr('data-id') );
 	 				break;
 	 			case 'keydown':
 	 				if (e.keyCode === 13 && !e.shiftKey) {
@@ -368,37 +374,49 @@ jQuery( function ($) {
 	  * UI Sortable */
 	 (function () {
 		var fixHelper = function(e, ui) {
-			ui.children().each( function() {
-				var elem = $(this);
-				elem.width( elem.width() );
+			var orgChild = ui.children(),
+				clone = ui.clone();
+				
+			clone.addClass('ui-drag-helper').children().each( function (i) {
+				$(this).width( orgChild.eq(i).width() );
 			});
 			
-			return ui;
+			return clone;
 		};
 
 	 	$('#budget').bind('BUDGET_LOADED', function () {
-	 		var nextElem, movedElem;
+	 		var movedFromNextElem, movedFromPrevElem, movedElem;
 	 		
 	 		$('#budget').find('tbody').sortable({
 	 			helper: fixHelper,
 	 			axis: 'y',
 	 			
 	 			start: function (e, ui) {
-	 				nextElem = ui.item.next().next();
+	 				movedFromNextElem = ui.item.next().next().children('th');
+	 				movedFromPrevElem = ui.item.prev().children('th');
 	 			},	 		
 	 			stop: function (e, ui) {
 					movedElem = ui.item;
-					nextElem.attr('data-parent', nextElem.prev().attr('id') || 0);
-					movedElem.attr('data-parent', movedElem.prev().attr('id') || 0);
-					movedElem.next().attr('data-parent', movedElem.attr('id'));
 					
-					var changeElems = [
-						{ id: nextElem.attr('data-id'), setParent: nextElem.prev().attr('id') || 0 },
-						{ id: movedElem.attr('data-id'), setParent: movedElem.prev().attr('id') || 0 },
-						{ id: movedElem.next().attr('data-id'), setParent: movedElem.attr('id') }
+					movedElem.children().css('width', 'auto');
+					
+					var movedToNextElem = movedElem.next().children('th'),
+						movedToPrevElem = movedElem.prev().children('th'),
+						movedTh = movedElem.children('th');
+												
+					movedFromNextElem.attr('data-parent-id', movedFromPrevElem.attr('data-id') || 0); // Next / prev from start
+					
+					movedTh.attr('data-parent-id', movedToPrevElem.attr('data-id') || 0); // New location of moved elem
+					
+					movedToNextElem.attr('data-parent-id', movedTh.attr('data-id')); // Moved to next elem
+										
+					var newPositions = [
+						{ id: parseInt(movedFromNextElem.attr('data-id')), setParent: parseInt(movedFromPrevElem.attr('data-id')) || 0 },
+						{ id: parseInt(movedTh.attr('data-id')), setParent: parseInt(movedToPrevElem.attr('data-id')) || 0 },
+						{ id: parseInt(movedToNextElem.attr('data-id')), setParent: parseInt(movedTh.attr('data-id')) }
 					];
 					
-					console.log(changeElems);
+					Budget.updateLinePositions( newPositions );
 	 			}
 	 		}).disableSelection();
 	 	});

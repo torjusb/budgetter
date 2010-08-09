@@ -14,7 +14,13 @@
 	var Budget = function () {
 		var loadedBudget = localStorage.getItem('loadedBudget'),
 		
-			calculations = [];
+			calculations = [],
+			
+			_sortBudgetLines = function (a, b, c) {
+				if (a.parent_id === 0 || a.id === b.parent_id) {
+					return -1;
+				}
+			};
 		
 		return {
 			newBudget: function (budget_name) {		
@@ -23,23 +29,37 @@
 						Budget.loadBudget(res.insertId);
 						
 						jQuery.event.trigger('CREATED_NEW_BUDGET');
-					});
+					}, Core.dbErrorHandler);
 				});
 			},
-			addLine: function (text, budget_id) {
+			addLine: function (text, parent_id, budget_id) {
 				budget_id = budget_id || loadedBudget;
 				
 				db.transaction( function (tx) {
-					tx.executeSql('INSERT INTO lines (budget_id, text, line_number, type) VALUES (?, ?, 1, "normal")', [budget_id, text]);
-					
-					jQuery.event.trigger('LINE_ADDED');
+					tx.executeSql('INSERT INTO lines (budget_id, text, type, parent_id) VALUES (?, ?, "normal", ?)', [budget_id, text, parent_id], function (tx, res) {
+						tx.executeSql('SELECT max(id) AS new_id FROM lines', [], function (tx, res) {
+							jQuery.event.trigger('LINE_ADDED', { newId: res.rows.item(0).new_id, text: text } );
+						}, Core.dbErrorHandler);
+					}, Core.dbErrorHandler);
 				});
 			},
-			updateLine: function (text, budget_id) {
+			updateLine: function (text, line_id, budget_id) {
 				budget_id = budget_id || loadedBudget;
 				
 				db.transaction( function (tx) {
-					tx.executeSql('UPDATE lines SET text = ? WHERE budget_id = ?', [text, budget_id]);
+					tx.executeSql('UPDATE lines SET text = ? WHERE id = ? AND budget_id = ?', [text, line_id, budget_id], null, Core.dbErrorHandler);
+				});
+			},
+			updateLinePositions: function (positions, budget_id) {
+				budget_id = budget_id || loadedBudget;
+				
+				db.transaction( function (tx) {
+					for (i = 0; i < positions.length; i++) {
+						var pos = positions[i],
+							sql = 'UPDATE lines SET parent_id = ? WHERE id = ? AND budget_id = ?';
+						
+						tx.executeSql(sql, [pos.setParent, pos.id, budget_id], null, Core.dbErrorHandler);
+					};
 				});
 			},
 			getBudgets: function (callback) {
@@ -53,30 +73,39 @@
 						budgets.length = res.rows.length;
 											
 						return callback(budgets);
-					});
+					}, Core.dbErrorHandler);
 				});
 			},
 			loadBudget: function (budget_id) {
 				localStorage.setItem('loadedBudget', budget_id);
 				loadedBudget = budget_id;
 				
-				var budgetTable = $('#budget').find('tbody').empty();
+				var budgetTable = $('#budget').find('tbody').empty(),
+					parentId = 0;
 				
 				db.transaction( function (tx) {
 					tx.executeSql('SELECT * FROM lines JOIN budgets ON lines.budget_id = budgets.id WHERE budget_id = ?', [budget_id], function (tx, result) {
-						var html = '';
+						var html = '', lines = [];
 						
 						for (i = 0; i < result.rows.length; i++) {
-							var row = result.rows.item(i),
+							lines.push(result.rows.item(i));
+						};
+						
+						lines.sort( _sortBudgetLines );
+						
+						for (i = 0; i < lines.length; i++) {
+							var row = lines[i],
 								expense = Budget.parseExpense( row.text );
 								
-							html = html + '<tr><th contenteditable data-id="' + row.id + '">' + row.text + '</th><td>' + expense + '</td></tr>';
+							html = html + '<tr><th contenteditable data-id="' + row.id + '" data-parent-id="' + parentId + '">' + row.text + '</th><td>' + expense + '</td></tr>';
+							
+							parentId = row.id;
 						};
 						
 						budgetTable.append( html );
 						
 						jQuery.event.trigger('BUDGET_LOADED', {budget_id: budget_id});
-					});
+					}, Core.dbErrorHandler);
 				});
 			},
 			removeBudget: function (budget_id, callback) {
@@ -85,7 +114,7 @@
 				db.transaction( function (tx) {
 					tx.executeSql('UPDATE budgets SET status = "deleted" WHERE id = ?', [budget_id], function (tx, res) {
 						callback && callback(res);
-					});
+					}, null, Core.dbErrorHandler);
 				});
 			},
 			logBudget: function (budget_id, callback) {
@@ -94,14 +123,14 @@
 				db.transaction( function (tx) {
 					tx.executeSql('UPDATE budgets SET status = "logged" WHERE id = ?', [budget_id], function (tx, res) {
 						callback && callback(res);
-					});
+					}, null, Core.dbErrorHandler);
 				});
 			},
 			setDescription: function (description, budget_id) {
 				budget_id = budget_id || loadedBudget;
 				
 				db.transaction( function (tx) {
-					tx.executeSql('UPDATE budgets SET description = ? WHERE id = ?', [description, budget_id]);
+					tx.executeSql('UPDATE budgets SET description = ? WHERE id = ?', [description, budget_id], null, Core.dbErrorHandler);
 				});
 			},
 			getDescription: function (callback, budget_id) {
@@ -163,28 +192,7 @@
 			}
 		};
 	}();
-		
-	/*
-	 * UI Handlers */
-	jQuery( function ($) {
-		$('#main').delegate('th', 'focusin focusout', function (e) {
-			var elem = $(this),
-				isNew = !!parseInt( elem.attr('data-is-new') );
-						
-			switch (e.type) {
-				case 'focusout':
-					Budget.addLine( elem.text() );
-				case 'focusin':
-					if (isNew) {
-						$('<tr><th contenteditable data-is-new="1"></th><td></td></tr>').insertAfter( elem.parent() );
-						elem.attr('data-is-new', 0);
-					}
-			}			
-		});
-		
 
-	});
-	
 	
 	Core.addModule('budget', Budget); 
 })(window);
