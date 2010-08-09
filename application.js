@@ -377,18 +377,28 @@ jQuery( function ($) {
 		};
 
 	 	$('#budget').bind('BUDGET_LOADED', function () {
+	 		var nextElem, movedElem;
+	 		
 	 		$('#budget').find('tbody').sortable({
 	 			helper: fixHelper,
 	 			axis: 'y',
 	 			
 	 			start: function (e, ui) {
-	 				console.log('start', ui.item.siblings().css('background', 'blue'));
-	 			},
-	 			sort: function (e, ui) {
-	 				console.log('upadte', ui);
-	 			},
+	 				nextElem = ui.item.next().next();
+	 			},	 		
 	 			stop: function (e, ui) {
-	 				console.log('stop', ui);
+					movedElem = ui.item;
+					nextElem.attr('data-parent', nextElem.prev().attr('id') || 0);
+					movedElem.attr('data-parent', movedElem.prev().attr('id') || 0);
+					movedElem.next().attr('data-parent', movedElem.attr('id'));
+					
+					var changeElems = [
+						{ id: nextElem.attr('data-id'), setParent: nextElem.prev().attr('id') || 0 },
+						{ id: movedElem.attr('data-id'), setParent: movedElem.prev().attr('id') || 0 },
+						{ id: movedElem.next().attr('data-id'), setParent: movedElem.attr('id') }
+					];
+					
+					console.log(changeElems);
 	 			}
 	 		}).disableSelection();
 	 	});
