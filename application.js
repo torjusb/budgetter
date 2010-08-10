@@ -1,9 +1,12 @@
-$(document).bind('ALL_MODULES_LOADED', function () {
-
+jQuery( function ($) {
 	/*
 	 * Modules */
-	var Budget 	= _budgetter.getModule('budget');
-	 console.log('moduke', Budget);
+	var Budget 	= _budgetter.getModule('budget'),
+		Modal	= _budgetter.getModule('modal'),
+		Menu	= _budgetter.getModule('menu'),
+		
+		allViews = $('.view');
+	 
 	Budget.addCalculation(0, /\d+/, function (string, regex) {
 		return parseFloat(string.match(regex));
 	});
@@ -26,22 +29,23 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 	
 	/*
 	 * Budget navigation */
-	( function () {
-	 	var budgetList = $('#budgets'),
+ 	var budgetList = $('#budgets'),
 	
-		refreshBudgetList = function (budgets) {
-			var html, template = '<li data-budget-id="{id}">{name}</li>';
-			
-			budgetList.empty();
-			
-			for (i = 0; i < budgets.length; i++) {
-				html += templateStr( template, { id: budgets[i].id, name: budgets[i].name } );
-			}
-			
-			$( html ).appendTo(budgetList);
-			
-			Budget.loadBudget( localStorage.getItem('loadedBudget') || 1 );
-		};
+	refreshBudgetList = function (budgets) {
+		var html, template = '<li data-budget-id="{id}">{name}</li>';
+		
+		budgetList.empty();
+		
+		for (i = 0; i < budgets.length; i++) {
+			html += templateStr( template, { id: budgets[i].id, name: budgets[i].name } );
+		}
+		
+		$( html ).appendTo(budgetList);
+		
+		Budget.loadBudget( localStorage.getItem('loadedBudget') || 1 );
+	}; 
+	
+	( function () {
 		
 		$(document).bind('click', function (e) {
 			$('#contextMenu').hide();
@@ -118,6 +122,7 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 					break;
 			}
 		}).bind('BUDGET_LOADED', function (e, data) {
+			allViews.hide().filter('#budgetView').show();
 			budgetList.find('li').removeClass('selected').filter('[data-budget-id="' + data.budget_id + '"]').addClass('selected');
 		});
 	})();
@@ -179,7 +184,6 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 					}
 				case 'keydown':
 					if (e.keyCode === 13 && !e.shiftKey) {
-						console.log(e);
 						e.preventDefault();
 						field.blur();
 					}
@@ -278,7 +282,6 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 	 		}
 			
 	 		if (e.type === 'mouseup' && movingCol) {
-	 			console.log('save');
 	 			localStorage.setItem('budget-col-width', totalLabel.width());
 	 			localStorage.setItem('col-width', left.width());
 	 			mouseKeyDown = movingCol = false;
@@ -371,7 +374,7 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 	 
 	 /*
 	  * UI Sortable */
-	 (function () {
+	(function () {
 		var fixHelper = function(e, ui) {
 			var orgChild = ui.children(),
 				clone = ui.clone();
@@ -419,11 +422,54 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 	 			}
 	 		}).disableSelection();
 	 	});
-	 })();
+	})();
 	 
 	 /*
 	  * Logbook view */
-	 ( function () {
+	( function () {
+	 	var menuElem = $('#openLog'),
+	 		viewElem = $('#logbookView.view'),	 		
+	 		loggedBudgets = $('#loggedBudgets', viewElem),
+	 		noLogged = $('p.no-logged', viewElem),
+	 		
+	 		template = '<li data-id="{id}" title="{desc}">{name}<button>Make active</button></li>';
+	 		
+	 	menuElem.bind('click', function (e) {
+	 		var html = '';
+	 		
+	 		allViews.hide();
+	 		viewElem.show();
+	 		
+	 		Budget.getLoggedBudgets( function (res) {
+	 			for (i = 0; i < res.rows.length; i++) {
+	 				var row = res.rows.item(i);
+	 				
+	 				html += templateStr(template, { id: row.id, desc: row.description, name: row.name });
+	 			}
+	 			
+	 			if (res.rows.length > 0) { // Have logged items
+	 				noLogged.hide();
+	 				loggedBudgets.empty().show().append( html );
+	 			} else {
+	 				noLogged.show();
+	 				loggedBudgets.hide();
+	 			}
+	 		});
+	 	});
 	 	
-	 })();
+	 	loggedBudgets.delegate('button', 'click', function (e) {
+	 		var elem = $(this).parent(),
+	 			id = parseInt(elem.attr('data-id'));
+	 			
+	 		Budget.setBudgetStatus('active', id, function () {
+	 			elem.remove();	 			
+				Budget.getBudgets( refreshBudgetList ); 
+				Budget.loadBudget(id);
+				
+				if (loggedBudgets.children().length < 1) {
+					noLogged.show();
+				}
+	 		});
+	 	});
+	})();
 });

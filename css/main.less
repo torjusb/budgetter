@@ -369,7 +369,7 @@ input[type="submit"] {
 		
 		#totalFixed {
 			position: absolute;
-			bottom: -29px;
+			bottom: -31px;
 			height: 30px;
 			background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#EDEDED), to(#D9D9D9));
 			font-size: 14px;
@@ -391,6 +391,46 @@ input[type="submit"] {
 					border-right: 1px solid #888;
 					-webkit-box-sizing: border-box;
 				}
+			}
+		}
+		
+		#logbookView {
+			padding: 20px;
+			
+			#loggedBudgets {
+				list-style: none;
+				width: 100%;
+				-webkit-box-sizing: border-box;
+				border: 1px solid #ddd;
+				background: #eee;
+				.border-radius;
+				
+				li {
+					padding: 10px;
+					font-size: 14px;
+					border-bottom: 1px solid #ddd;
+					
+					&:last-of-type {
+						border: 0;
+					}
+					
+					button {
+						float: right;
+						position: relative;
+						top: -4px;
+					}
+				}
+			}
+			
+			.no-logged {
+				font-size: 14px;
+				text-align: center;
+				background: #eee;
+				padding: 10px;
+				color: #888;
+				text-shadow: #fff 1px 1px 1px;
+				border: 1px solid #ddd;
+				.border-radius;
 			}
 		}
 	}

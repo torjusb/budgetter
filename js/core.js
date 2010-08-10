@@ -7,7 +7,7 @@
 			}
 		},
 		_db = db.open(),
-		modules = [], loadedModules = {};
+		modules = {};
 		
 		return {
 			executeSql: function (sql, data, callback) {
@@ -26,32 +26,14 @@
 				console && console.log(e);
 			},
 			
-			addModule: function (id, api) {
-				var module = {
-					id: id,
-					api: api
-				};
-				
-				modules.push(module);
+			addModule: function (id, module) {
+				modules[id] = module;
 			},
 			getModule: function (id) {
-				return loadedModules[id];
-			},
-			loadAllModules: function () {
-				for (i = 0; i < modules.length; i++) {
-					var module = modules[i],
-						id = module.id,
-						api = module.api();
-					
-					loadedModules[id] = api;
-				}
-
-				jQuery(document).trigger('ALL_MODULES_LOADED');
+				return modules[id];
 			}
 		};
 	}();
-	
-	jQuery(document).ready( Core.loadAllModules );
 	
 	window._budgetter = Core;
 })(window);

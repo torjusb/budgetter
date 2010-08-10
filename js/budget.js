@@ -16,6 +16,8 @@
 		
 			calculations = [],
 			
+			_statuses = ['active', 'logged', 'deleted'];
+			
 			_sortBudgetLines = function (a, b, c) {
 				if (a.parent_id === 0 || a.id === b.parent_id) {
 					return -1;
@@ -76,13 +78,14 @@
 					}, Core.dbErrorHandler);
 				});
 			},
+			// TODO: Rewrite to use callback insted?
 			loadBudget: function (budget_id) {
 				localStorage.setItem('loadedBudget', budget_id);
 				loadedBudget = budget_id;
 				
 				var budgetTable = $('#budget').find('tbody').empty(),
 					parentId = 0;
-				
+
 				db.transaction( function (tx) {
 					tx.executeSql('SELECT * FROM lines JOIN budgets ON lines.budget_id = budgets.id WHERE budget_id = ?', [budget_id], function (tx, result) {
 						var html = '', lines = [];
@@ -102,10 +105,30 @@
 							parentId = row.id;
 						};
 						
-						budgetTable.append( html );
+						budgetTable.empty().append( html );
 						
 						jQuery.event.trigger('BUDGET_LOADED', {budget_id: budget_id});
 					}, Core.dbErrorHandler);
+				});
+			},
+			getLoggedBudgets: function (callback) {
+				db.transaction( function (tx) {
+					tx.executeSql('SELECT * FROM budgets WHERE status = "logged"', [], function (tx, res) {
+						callback && callback(res);
+					}, Core.dbErrorHandler);
+				});
+			},
+			setBudgetStatus: function (status, budget_id, callback) {
+				if (!status.indexOf(_statuses)) {
+					throw new Error("Can't set budget status to " + status);
+				}
+				
+				budget_id = budget_id || loadedBudget;
+				
+				db.transaction( function (tx) {
+					tx.executeSql('UPDATE budgets SET status = :status WHERE id = :budget_id', [status, budget_id], function (tx, res) {
+						callback && callback();
+					});
 				});
 			},
 			removeBudget: function (budget_id, callback) {
@@ -191,7 +214,7 @@
 				return total;
 			}
 		};
-	};
+	}();
 
 	
 	Core.addModule('budget', Budget); 
