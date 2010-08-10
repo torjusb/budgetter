@@ -191,7 +191,7 @@
 				return total;
 			}
 		};
-	}();
+	};
 
 	
 	Core.addModule('budget', Budget); 

@@ -1,10 +1,9 @@
-jQuery( function ($) {
+$(document).bind('ALL_MODULES_LOADED', function () {
+
 	/*
 	 * Modules */
-	var Budget 	= _budgetter.getModule('budget'),
-		Modal	= _budgetter.getModule('modal'),
-		Menu	= _budgetter.getModule('menu');
-	 
+	var Budget 	= _budgetter.getModule('budget');
+	 console.log('moduke', Budget);
 	Budget.addCalculation(0, /\d+/, function (string, regex) {
 		return parseFloat(string.match(regex));
 	});

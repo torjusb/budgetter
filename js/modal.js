@@ -153,5 +153,5 @@
 	});
 */
 	
-	Core.addModule('modal', Modal);
+//	Core.addModule('modal', Modal);
 })(window);
