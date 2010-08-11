@@ -111,15 +111,20 @@
 					}, Core.dbErrorHandler);
 				});
 			},
-			getLoggedBudgets: function (callback) {
+			getBudgetsByStatus: function (status, callback) {
+				console.log(status.indexOf(_statuses));
+				if (status.indexOf(_statuses) === -1) {
+					throw new Error("Can't get budgets with status: " + status);
+				}
+				
 				db.transaction( function (tx) {
-					tx.executeSql('SELECT * FROM budgets WHERE status = "logged"', [], function (tx, res) {
+					tx.executeSql('SELECT * FROM budgets WHERE status = :status', [status], function (tx, res) {
 						callback && callback(res);
 					}, Core.dbErrorHandler);
 				});
 			},
-			setBudgetStatus: function (status, budget_id, callback) {
-				if (!status.indexOf(_statuses)) {
+			setBudgetStatus: function (status, budget_id, callback) {	
+				if (status.indexOf(_statuses) === -1) {
 					throw new Error("Can't set budget status to " + status);
 				}
 				

@@ -430,7 +430,7 @@ jQuery( function ($) {
 	 	var menuElem = $('#openLog'),
 	 		viewElem = $('#logbookView.view'),	 		
 	 		loggedBudgets = $('#loggedBudgets', viewElem),
-	 		noLogged = $('p.no-logged', viewElem),
+	 		noLogged = $('p.empty-list', viewElem),
 	 		
 	 		template = '<li data-id="{id}" title="{desc}">{name}<button>Make active</button></li>';
 	 		
@@ -440,7 +440,7 @@ jQuery( function ($) {
 	 		allViews.hide();
 	 		viewElem.show();
 	 		
-	 		Budget.getLoggedBudgets( function (res) {
+	 		Budget.getBudgetsByStatus('logged', function (res) {
 	 			for (i = 0; i < res.rows.length; i++) {
 	 				var row = res.rows.item(i);
 	 				
@@ -468,6 +468,55 @@ jQuery( function ($) {
 				
 				if (loggedBudgets.children().length < 1) {
 					noLogged.show();
+				}
+	 		});
+	 	});
+	})();
+	
+	/*
+	 * Trashbook view; TODO: Merge with above? */
+	( function () {
+		var menuElem = $('#openTrash'),
+			viewElem = $('#trashView.view'),
+			trashedBudgets = $('#trashedBudgets', viewElem),
+			noTrashed = $('p.empty-list', viewElem),
+			
+			template = '<li data-id="{id}" title="{desc}">{name}<button>Make active</button></li>';
+			
+		menuElem.bind('click', function () {
+			var html = '';
+			
+			allViews.hide();
+			viewElem.show();
+			
+			Budget.getBudgetsByStatus('deleted', function (res) {
+				for (i = 0; i < res.rows.length; i++) {
+	 				var row = res.rows.item(i);
+	 				
+	 				html += templateStr(template, { id: row.id, desc: row.description, name: row.name });
+	 			}
+	 			
+	 			if (res.rows.length > 0) {
+	 				noTrashed.hide();
+	 				trashedBudgets.empty().show().append( html );
+	 			} else {
+	 				noTrashed.show();
+	 				trashedBudgets.hide();
+	 			}
+			});
+		});
+		
+		trashedBudgets.delegate('button', 'click', function (e) {
+	 		var elem = $(this).parent(),
+	 			id = parseInt(elem.attr('data-id'));
+	 			
+	 		Budget.setBudgetStatus('active', id, function () {
+	 			elem.remove();	 			
+				Budget.getBudgets( refreshBudgetList ); 
+				Budget.loadBudget(id);
+				
+				if (trashedBudgets.children().length < 1) {
+					noTrashed.show();
 				}
 	 		});
 	 	});
