@@ -113,7 +113,7 @@
 			},
 			getBudgetsByStatus: function (status, callback) {
 				console.log(status.indexOf(_statuses));
-				if (status.indexOf(_statuses) === -1) {
+				if (_statuses.indexOf(status) === -1) {
 					throw new Error("Can't get budgets with status: " + status);
 				}
 				
@@ -124,7 +124,7 @@
 				});
 			},
 			setBudgetStatus: function (status, budget_id, callback) {	
-				if (status.indexOf(_statuses) === -1) {
+				if (_statuses.indexOf(status) === -1) {
 					throw new Error("Can't set budget status to " + status);
 				}
 				
