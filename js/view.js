@@ -12,13 +12,31 @@
 	/*
 	 * API */
 	var View = function () {
-		var _activeView;
+		var _views = {},
+			_activeView;
 		
-		return {
-
+		View = {
+			addView: function (id, view) {
+				_views[id] = view;
+				
+				return View;
+			},
+			setActiveView: function (id) {
+				_activeView = _views[id];
+				
+				jQuery.event.trigger('NEW_VIEW_SET', { view: _activeView });
+			},
+			getActiveView: function () {
+				return _activeView;
+			},
+			getAllViews: function () {
+				return _views;
+			}
 		};
-	}();
+		
+		return View;
+	};
 
 	
-	//Core.addModule('view', View); 
-})(window);
+	Core.addModule('view', View); 
+})();

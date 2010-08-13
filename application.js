@@ -2,9 +2,16 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 	/*
 	 * Modules */
 	var Budget 	= _budgetter.getModule('budget'),
+		View 	= _budgetter.getModule('view'),
 		
 		allViews = $('.view');
-	 
+
+	View.addView('budget', $('#budgetView'))
+		.addView('trashcan', $('#trashView'))
+		.addView('logbook', $('#logbookView'))
+		.setActiveView('budget');
+			
+	
 	Budget.addCalculation(0, /\d+/, function (string, regex) {
 		return parseFloat(string.match(regex));
 	});
@@ -41,6 +48,8 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 		$( html ).appendTo(budgetList);
 		
 		Budget.loadBudget( localStorage.getItem('loadedBudget') || 1 );
+		
+		View.setActiveView('budget');
 	}; 
 	
 	( function () {
@@ -190,7 +199,7 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 	})();
 	
 	/*
-	 * Add calculation */
+	 * Add expense */
 	( function () {
 		var newCalcForm = $('#newCalculation'),
 			budgetTable = $('#budget');
@@ -301,20 +310,29 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 	 /*
 	  * Table height  TODO: Move to window mangagment? */
 	 ( function () {
-/*
 	 	var scrollAreas = $('.scroll-area', allViews),
 	 		doc = $(document),
 	 		win = $(window),
-	 		
-	 		offset = budgetBox.offset().top,
-	 		docHeight = doc.height();
-
-	 	//budgetBox.height(docHeight - offset + 3  - $('#totalFixed').outerHeight());
 	 	
-	 	win.bind('resize', function (e) {
-	 		//budgetBox.height((win.height() - offset + 3) - $('#totalFixed').outerHeight()); // TODO: Figure out if I need to hardcore 3
+	 		docHeight = doc.height(),
+	 		
+	 		scrollArea, offset, exclude
+	 		
+	 		resizeScrollArea = function () {
+	 			scrollArea.css('height', (win.height() - offset - exclude));	
+	 		};
+	 		
+	 	$(document).bind('NEW_VIEW_SET', function (e, data) {
+	 		scrollArea = data.view.find('div.scroll-area');
+	 		offset = scrollArea.offset().top;
+	 		exclude = parseFloat(scrollArea.nextAll().outerHeight()) || 0;
+	 		
+	 		resizeScrollArea();
 	 	});
-*/
+	 		
+	 	
+	 	win.bind('resize', resizeScrollArea);
+
 	 })();
 	 
 	 /*
@@ -437,6 +455,8 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 	 	menuElem.bind('click', function (e) {
 	 		var html = '';
 	 		
+	 		View.setActiveView('logbook');
+	 		
 	 		allViews.hide();
 	 		viewElem.show();
 	 		
@@ -485,9 +505,11 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 			
 		menuElem.bind('click', function () {
 			var html = '';
-			
+
 			allViews.hide();
 			viewElem.show();
+			
+			View.setActiveView('trashcan');
 			
 			Budget.getBudgetsByStatus('deleted', function (res) {
 				for (i = 0; i < res.rows.length; i++) {

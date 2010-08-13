@@ -314,9 +314,8 @@ input[type="submit"] {
 			}
 		}
 		
-		.budget-wrap {
-			height: 300px;
-			overflow-y: auto;
+		#budgetView {
+			height: 500px;
 			position: relative;
 			
 			#budget {
@@ -367,9 +366,14 @@ input[type="submit"] {
 			}
 		}
 		
+		.scroll-area {
+			overflow-y: auto;
+			position: relative;
+		}
+		
 		#totalFixed {
-			position: absolute;
-			bottom: -31px;
+			position: fixed;
+			bottom: 0;
 			height: 30px;
 			background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#EDEDED), to(#D9D9D9));
 			font-size: 14px;
@@ -395,7 +399,11 @@ input[type="submit"] {
 		}
 		
 		.view.inactiveView {
-			padding: 20px;
+			
+			.scroll-area {
+				padding: 20px;
+				-webkit-box-sizing: border-box;
+			}
 			
 			.budgetList {
 				list-style: none;
