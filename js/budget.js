@@ -24,7 +24,7 @@
 				}
 			};
 		
-		return {
+		Budget =  {
 			newBudget: function (budget_name) {		
 				db.transaction( function (tx) {
 					tx.executeSql('INSERT INTO budgets (name) VALUES (?)', [budget_name], function (tx, res) {
@@ -219,7 +219,9 @@
 				return total;
 			}
 		};
-	}();
+		
+		return Budget;
+	};
 
 	
 	Core.addModule('budget', Budget); 

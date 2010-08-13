@@ -1,9 +1,7 @@
-jQuery( function ($) {
+$(document).bind('ALL_MODULES_LOADED', function () {
 	/*
 	 * Modules */
 	var Budget 	= _budgetter.getModule('budget'),
-		Modal	= _budgetter.getModule('modal'),
-		Menu	= _budgetter.getModule('menu'),
 		
 		allViews = $('.view');
 	 
@@ -303,18 +301,20 @@ jQuery( function ($) {
 	 /*
 	  * Table height  TODO: Move to window mangagment? */
 	 ( function () {
-	 	var budgetBox = $('div.budget-wrap'),
+/*
+	 	var scrollAreas = $('.scroll-area', allViews),
 	 		doc = $(document),
 	 		win = $(window),
 	 		
 	 		offset = budgetBox.offset().top,
 	 		docHeight = doc.height();
-	 		 	
-	 	budgetBox.height(docHeight - offset + 3  - $('#totalFixed').outerHeight());
+
+	 	//budgetBox.height(docHeight - offset + 3  - $('#totalFixed').outerHeight());
 	 	
 	 	win.bind('resize', function (e) {
-	 		budgetBox.height((win.height() - offset + 3) - $('#totalFixed').outerHeight()); // TODO: Figure out if I need to hardcore 3
+	 		//budgetBox.height((win.height() - offset + 3) - $('#totalFixed').outerHeight()); // TODO: Figure out if I need to hardcore 3
 	 	});
+*/
 	 })();
 	 
 	 /*

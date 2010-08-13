@@ -20,5 +20,5 @@
 	}();
 
 	
-	Core.addModule('view', View); 
+	//Core.addModule('view', View); 
 })(window);

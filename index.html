@@ -16,7 +16,6 @@
 	<script src="js/math-string-parser.js"></script>
 	<script src="js/core.js"></script>
 	<script src="js/budget.js"></script>
-	<script src="js/menu.js"></script>
 	<script src="application.js"></script>
 	<script type="text/javascript" charset="utf-8">
 	    less.env = "development";
@@ -116,7 +115,7 @@
 					<input type="text" name="calculation" placeholder="Add expense" />
 					<input type="submit" value="Add" />
 				</form>
-				<div class="budget-wrap">
+				<div class="scroll-area">
 					<table id="budget">
 						<colgroup>
 							<col id="col1" />
@@ -138,13 +137,17 @@
 			</div>
 			
 			<div id="logbookView" class="view inactiveView">
-				<ul id="loggedBudgets" class="budgetList"></ul>
-				<p class="empty-list">No logged items.</p>
+				<div class="scroll-area">
+					<ul id="loggedBudgets" class="budgetList"></ul>
+					<p class="empty-list">No logged items.</p>
+				</div>
 			</div>
 			
 			<div id="trashView" class="view inactiveView">
-				<ul id="trashedBudgets" class="budgetList"></ul>
-				<p class="empty-list">No items in the trash.</p>
+				<div class="scroll-area">
+					<ul id="trashedBudgets" class="budgetList"></ul>
+					<p class="empty-list">No items in the trash.</p>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -157,6 +160,5 @@
 		<li data-menu-action="log"><span>Log budget</span></li>
 		<li data-menu-action="delete"><span>Delete</span></li>
 	</menu>
-	<script src="js/modal.js"></script>
 </body>
 </html>
