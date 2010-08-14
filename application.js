@@ -68,7 +68,7 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 					var row = rows[type][i],
 						expense = Budget.parseExpense( row.text );
 						
-					html = html + '<tr><th contenteditable data-id="' + row.id + '" data-parent-id="' + parentId + '">' + row.text + '</th><td>' + expense + '</td></tr>';
+					html = html + '<tr><th contenteditable data-id="' + row.id + '" data-parent-id="' + parentId + '"><input type="button" value="Remove">' + row.text + '</th><td>' + expense + '</td></tr>';
 					
 					parentId = row.id;
 				}
@@ -310,7 +310,7 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 		
 		budgetTables.find('tbody').bind('LINE_ADDED_TO_BUDGET', function (e, data) {
 			var tbody = $(this),
-				template = '<tr><th contenteditable data-id="{id}">{text}</th><td>{calcRes}</td></tr>',
+				template = '<tr><th contenteditable data-id="{id}"><input type="button" value="Remove" />{text}</th><td>{calcRes}</td></tr>',
 				
 				res = Budget.parseExpense(data.text);
 			
@@ -332,6 +332,34 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 			Budget.addLine( type, value, parId );
 		});
 	})();
+	
+	/*
+	 * Remove budget row */
+	( function () {
+		var budgetTables = $('#budgetTables');
+		
+		budgetTables.delegate('input[type="button"]', 'click', function () {
+			var row = $(this).parents('tr:first'),
+				id = parseInt(row.children('th').attr('data-id')),
+				parId = parseInt(row.children('th').attr('data-parent-id')),
+				nextElem = row.next().children('th'),
+				
+				positions;
+			
+			if (nextElem.length > 0) {
+				positions = {
+					id: parseInt(nextElem.attr('data-id')), setParent: parId
+				}
+			}
+			
+			Budget.removeLine(id, positions, null, function () {
+				row.remove();
+				
+				nextElem.attr('data-parent-id', parId);
+			});
+		});
+	})();
+	
 	
 	/*
 	 * Window management */

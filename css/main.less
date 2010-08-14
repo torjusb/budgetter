@@ -348,8 +348,8 @@ input[type="submit"] {
 					&:last-child {
 						border-left: 1px solid #ddd;
 						position: relative;
-						left: -1px;
-						margin-right: -1px;
+						-webkit-box-sizing: border-box;
+						margin-left: -1px;
 					}
 					
 					table {
@@ -361,16 +361,27 @@ input[type="submit"] {
 							max-width: 400px;
 						}
 						
-						th, td {
-							border-bottom: 1px solid #ddd;
-							font-weight: 400;
-							font-size: 14px;
-							line-height: 1.4;
-							vertical-align: top;
-							padding: 5px 10px;
-						}
 						tbody {
 							cursor: move;
+
+							tr {
+
+								th, td {
+									border-bottom: 1px solid #ddd;
+									font-weight: 400;
+									font-size: 14px;
+									line-height: 1.4;
+									padding: 5px 10px;
+								}
+								
+								input[type="button"] {
+									position: absolute;
+									left: 5px;
+									margin-top: 0;
+									display: none;
+								}
+								&:hover input[type="button"] { display: block; }
+							}
 						}
 						
 						.ui-drag-helper {

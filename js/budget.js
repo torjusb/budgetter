@@ -55,6 +55,19 @@
 					tx.executeSql('UPDATE lines SET text = ? WHERE id = ? AND budget_id = ?', [text, line_id, budget_id], null, Core.dbErrorHandler);
 				});
 			},
+			removeLine: function (line_id, positions, budget_id, callback) {
+				budget_id = budget_id || loadedBudget;
+				
+				db.transaction( function (tx) {
+					tx.executeSql('DELETE FROM lines WHERE id = :line_id', [line_id], function (tx, res) {
+						if (positions) {
+							tx.executeSql('UPDATE lines SET parent_id = ? WHERE id = ? AND budget_id = :budget_id', [positions.setParent, positions.id, budget_id], null, Core.dbErrorHandler);	
+						}
+						
+						callback && callback();
+					}, Core.dbErrorHandler)
+				});
+			},
 			updateLinePositions: function (positions, budget_id) {
 				budget_id = budget_id || loadedBudget;
 				
