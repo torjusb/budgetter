@@ -116,6 +116,30 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 	})();
 	
 	/*
+	 * Trashbook / logbook make active button */
+	( function () {
+		var inactiveViews = $('#right').children('.inactiveView');
+	
+		inactiveViews.delegate('button', 'click', function (e) {
+	 		var elem = $(this).parent(),
+	 			view = elem.parents('.view:first'),
+	 			emptyElem = $('p.empty-list', view),
+	 			id = parseInt(elem.attr('data-id'));
+	 			
+	 		Budget.setBudgetStatus('active', id, function () {
+	 			elem.remove();	 			
+				Budget.getBudgets( refreshBudgetList ); 
+				Budget.loadBudget(id);
+				
+				if ($('ul.budgetLis', view).children().length < 1) {
+					emptyElem.show();
+				}
+	 		});
+	 	});
+	})();
+	
+	
+	/*
 	 * Budget navigation */
  	var budgetList = $('#budgets'),
 	
