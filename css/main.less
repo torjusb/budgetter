@@ -248,14 +248,26 @@ input[type="submit"] {
 		}
 		
 		#col-sizer {
-			width: 1px;
+			width: 5px;
 			height: 100%;
-			background: #888;
+			background: transparent;
 			position: absolute;
 			top: 0;
 			right: -1px;
 			cursor: col-resize;
+			
+			/* Small trick, so we can keep the resize width wide,
+			   but only show a 1px line */
+			&:after {
+				width: 1px;
+				height: 100%;
+				content: "";
+				position: absolute;
+				left: 4px;
+				background: #888;
+			}
 		}
+		
 	}
 	
 	#right {
