@@ -32,12 +32,70 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 		});
 	};
 	
+	
+	var loadInactiveBudgets = function (type) {
+	 	viewElem = View.getActiveView(),	 		
+ 		listElem = $('ul.budgetList', viewElem),
+	 	emptyElem = $('p.empty-list', viewElem),
+	 		
+ 		template = '<li data-id="{id}" title="{desc}">{name}<button>Make active</button></li>',
+ 		html = '';
+ 		
+ 		Budget.getBudgetsByStatus(type, function (res) {
+ 			for (i = 0; i < res.rows.length; i++) {
+ 				var row = res.rows.item(i);
+ 				
+ 				html += templateStr(template, { id: row.id, desc: row.description, name: row.name });
+ 			}
+ 			
+ 			if (res.rows.length > 0) { // Have logged items
+ 				emptyElem.hide();
+ 				listElem.empty().show().append( html );
+ 			} else {
+ 				emptyElem.show();
+ 				listElem.hide();
+ 			}
+	 	});
+	};
+
+	/*
+	 * Navigation */
+	( function () {
+		var navContainer = $('#left'),
+			navItem = 'li[data-action]';
+				
+		navContainer.delegate(navItem, 'click', function (e) {
+			var elem = $(this),
+				view = elem.attr('data-view'),
+				action = elem.attr('data-action');
+				
+			navContainer.find('li.selected').removeClass('selected');
+			elem.addClass('selected');
+			
+			switch (action) {
+				case 'loadbudget':
+					View.setActiveView( view );
+					Budget.loadBudget( elem.attr('data-budget-id') );
+					break;
+				case 'loadlog':
+					View.setActiveView( view );
+					loadInactiveBudgets('logged');
+					break;
+				case 'loadtrash':
+					View.setActiveView( view );
+					loadInactiveBudgets('deleted');
+					break;
+				
+			}
+		});
+	})();
+	
 	/*
 	 * Budget navigation */
  	var budgetList = $('#budgets'),
 	
 	refreshBudgetList = function (budgets) {
-		var html, template = '<li data-budget-id="{id}">{name}</li>';
+		var html, template = '<li data-budget-id="{id}" data-action="loadbudget" data-view="budget">{name}</li>';
 		
 		budgetList.empty();
 		
@@ -53,7 +111,6 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 	}; 
 	
 	( function () {
-		
 		$(document).bind('click', function (e) {
 			$('#contextMenu').hide();
 		});
@@ -105,15 +162,12 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 			Budget.getBudgets( refreshBudgetList );
 		});
 		Budget.getBudgets( refreshBudgetList );
-		budgetList.delegate('li', 'click contextmenu focusout keydown', function (e) {
+		budgetList.delegate('li', 'contextmenu focusout keydown', function (e) {
 			var elem = $(this),
 				budgetId = elem.attr('data-budget-id'),
 				contextMenu;
 
 			switch (e.type) {
-				case 'click':
-					Budget.loadBudget( elem.attr('data-budget-id') );
-					break;
 				case 'contextmenu':
 					openContextMenu(e, elem.attr('data-budget-id'));
 					break;
@@ -130,7 +184,8 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 			}
 		}).bind('BUDGET_LOADED', function (e, data) {
 			allViews.hide().filter('#budgetView').show();
-			budgetList.find('li').removeClass('selected').filter('[data-budget-id="' + data.budget_id + '"]').addClass('selected');
+			$('#left').find('li.selected').removeClass('selected');
+			budgetList.find('li[data-budget-id="' + data.budget_id + '"]').addClass('selected');
 		});
 	})();
 	
@@ -439,108 +494,6 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 					Budget.updateLinePositions( newPositions );
 	 			}
 	 		}).disableSelection();
-	 	});
-	})();
-	 
-	 /*
-	  * Logbook view */
-	( function () {
-	 	var menuElem = $('#openLog'),
-	 		viewElem = $('#logbookView.view'),	 		
-	 		loggedBudgets = $('#loggedBudgets', viewElem),
-	 		noLogged = $('p.empty-list', viewElem),
-	 		
-	 		template = '<li data-id="{id}" title="{desc}">{name}<button>Make active</button></li>';
-	 		
-	 	menuElem.bind('click', function (e) {
-	 		var html = '';
-	 		
-	 		View.setActiveView('logbook');
-	 		
-	 		allViews.hide();
-	 		viewElem.show();
-	 		
-	 		Budget.getBudgetsByStatus('logged', function (res) {
-	 			for (i = 0; i < res.rows.length; i++) {
-	 				var row = res.rows.item(i);
-	 				
-	 				html += templateStr(template, { id: row.id, desc: row.description, name: row.name });
-	 			}
-	 			
-	 			if (res.rows.length > 0) { // Have logged items
-	 				noLogged.hide();
-	 				loggedBudgets.empty().show().append( html );
-	 			} else {
-	 				noLogged.show();
-	 				loggedBudgets.hide();
-	 			}
-	 		});
-	 	});
-	 	
-	 	loggedBudgets.delegate('button', 'click', function (e) {
-	 		var elem = $(this).parent(),
-	 			id = parseInt(elem.attr('data-id'));
-	 			
-	 		Budget.setBudgetStatus('active', id, function () {
-	 			elem.remove();	 			
-				Budget.getBudgets( refreshBudgetList ); 
-				Budget.loadBudget(id);
-				
-				if (loggedBudgets.children().length < 1) {
-					noLogged.show();
-				}
-	 		});
-	 	});
-	})();
-	
-	/*
-	 * Trashbook view; TODO: Merge with above? */
-	( function () {
-		var menuElem = $('#openTrash'),
-			viewElem = $('#trashView.view'),
-			trashedBudgets = $('#trashedBudgets', viewElem),
-			noTrashed = $('p.empty-list', viewElem),
-			
-			template = '<li data-id="{id}" title="{desc}">{name}<button>Make active</button></li>';
-			
-		menuElem.bind('click', function () {
-			var html = '';
-
-			allViews.hide();
-			viewElem.show();
-			
-			View.setActiveView('trashcan');
-			
-			Budget.getBudgetsByStatus('deleted', function (res) {
-				for (i = 0; i < res.rows.length; i++) {
-	 				var row = res.rows.item(i);
-	 				
-	 				html += templateStr(template, { id: row.id, desc: row.description, name: row.name });
-	 			}
-	 			
-	 			if (res.rows.length > 0) {
-	 				noTrashed.hide();
-	 				trashedBudgets.empty().show().append( html );
-	 			} else {
-	 				noTrashed.show();
-	 				trashedBudgets.hide();
-	 			}
-			});
-		});
-		
-		trashedBudgets.delegate('button', 'click', function (e) {
-	 		var elem = $(this).parent(),
-	 			id = parseInt(elem.attr('data-id'));
-	 			
-	 		Budget.setBudgetStatus('active', id, function () {
-	 			elem.remove();	 			
-				Budget.getBudgets( refreshBudgetList ); 
-				Budget.loadBudget(id);
-				
-				if (trashedBudgets.children().length < 1) {
-					noTrashed.show();
-				}
-	 		});
 	 	});
 	})();
 });

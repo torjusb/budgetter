@@ -98,8 +98,8 @@
 				</form>
 			</nav>
 			<nav>
-				<li id="openTrash">Trashcan</li>
-				<li id="openLog">Logbook</li>
+				<li id="openTrash" data-action="loadtrash" data-view="trashcan">Trashcan</li>
+				<li id="openLog" data-action="loadlog" data-view="logbook">Logbook</li>
 			</nav>
 		</div>
 		<div id="right">
@@ -135,14 +135,14 @@
 			
 			<div id="logbookView" class="view inactiveView">
 				<div class="scroll-area">
-					<ul id="loggedBudgets" class="budgetList"></ul>
+					<ul class="budgetList"></ul>
 					<p class="empty-list">No logged items.</p>
 				</div>
 			</div>
 			
 			<div id="trashView" class="view inactiveView">
 				<div class="scroll-area">
-					<ul id="trashedBudgets" class="budgetList"></ul>
+					<ul class="budgetList"></ul>
 					<p class="empty-list">No items in the trash.</p>
 				</div>
 			</div>
