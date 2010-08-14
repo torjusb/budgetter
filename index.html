@@ -108,28 +108,46 @@
 					<h1 contenteditable>Budget name</h1>
 					<p class="description" contenteditable>Description</p>
 				</div>
-				<form id="newCalculation">
-					<input type="text" name="calculation" placeholder="Add expense" />
-					<input type="submit" value="Add" />
-				</form>
+				<div id="addRowForms">
+					<form class="outcome" data-row-type="outcome">
+						<input type="text" name="calculation" placeholder="Add outcome" />
+						<input type="submit" value="Add" />
+					</form>
+					<form class="income" data-row-type="income">
+						<input type="text" name="calculation" placeholder="Add income" />
+						<input type="submit" value="Add" />
+					</form>
+				</div>
 				<div class="scroll-area">
-					<table id="budget">
-						<colgroup>
-							<col id="col1" />
-						</colgroup>
-						<tfoot>
-							<tr>
-								<th>Total</th>
-								<td id="totalAmount"></td>
-							</tr>
-						</tfoot>
-						<tbody>
-						</tbody>
-					</table>
+					<div id="budgetTables">
+						<div class="outcome">
+							<table class="budget">
+								<colgroup>
+									<col class="col1" />
+								</colgroup>
+								<tfoot>
+									<tr>
+										<th>Total</th>
+										<td id="totalAmount"></td>
+									</tr>
+								</tfoot>
+								<tbody>
+								</tbody>
+							</table>
+						</div>
+						<div class="income">
+							<table class="budget">
+								<colgroup>
+									<col class="col1" />
+								</colgroup>
+								<tbody>
+								</tbody>
+							</table>
+						</div>
+					</div>
 				</div>
 				<div id="totalFixed">
-					<p class="label">Total</p>
-					<p class="amount">1337</p>
+					<p class="amount"></p>
 				</div>
 			</div>
 			

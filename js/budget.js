@@ -18,10 +18,12 @@
 			
 			_statuses = ['active', 'logged', 'deleted'];
 			
-			_sortBudgetLines = function (a, b, c) {
-				if (a.parent_id === 0 || a.id === b.parent_id) {
+			_sortBudgetLines = function (a, b) {
+				if (a.parent_id === 0 || a.id === b.parent_id) {
 					return -1;
 				}
+
+				return +1;
 			};
 		
 		Budget =  {
@@ -34,13 +36,14 @@
 					}, Core.dbErrorHandler);
 				});
 			},
-			addLine: function (text, parent_id, budget_id) {
+			addLine: function (type, text, parent_id, budget_id) {
 				budget_id = budget_id || loadedBudget;
 				
 				db.transaction( function (tx) {
-					tx.executeSql('INSERT INTO lines (budget_id, text, type, parent_id) VALUES (?, ?, "normal", ?)', [budget_id, text, parent_id], function (tx, res) {
+					tx.executeSql('INSERT INTO lines (budget_id, text, type, parent_id) VALUES (:budget_id, :text, :type, :parent_id)', [budget_id, text, type, parent_id], function (tx, res) {
 						tx.executeSql('SELECT max(id) AS new_id FROM lines', [], function (tx, res) {
-							jQuery.event.trigger('LINE_ADDED', { newId: res.rows.item(0).new_id, text: text } );
+							jQuery('#budgetTables').children('div.' + type).find('tbody').trigger('LINE_ADDED_TO_BUDGET', { newId: res.rows.item(0).new_id, text: text, type: type } );
+							jQuery.event.trigger('LINE_ADDED');
 						}, Core.dbErrorHandler);
 					}, Core.dbErrorHandler);
 				});
@@ -79,33 +82,32 @@
 				});
 			},
 			// TODO: Rewrite to use callback insted?
-			loadBudget: function (budget_id) {
+			loadBudget: function (budget_id, callback) {
 				localStorage.setItem('loadedBudget', budget_id);
 				loadedBudget = budget_id;
 				
-				var budgetTable = $('#budget').find('tbody').empty(),
+				var budgetTable = $('#budgetTables .outcome').find('tbody').empty(),
 					parentId = 0;
 
 				db.transaction( function (tx) {
 					tx.executeSql('SELECT * FROM lines JOIN budgets ON lines.budget_id = budgets.id WHERE budget_id = ?', [budget_id], function (tx, result) {
-						var html = '', lines = [];
-						
+						var html = '',
+							lines = {
+								outcome: [],
+								income: []
+							}
+													
 						for (i = 0; i < result.rows.length; i++) {
-							lines.push(result.rows.item(i));
-						};
-						
-						lines.sort( _sortBudgetLines );
-						
-						for (i = 0; i < lines.length; i++) {
-							var row = lines[i],
-								expense = Budget.parseExpense( row.text );
-								
-							html = html + '<tr><th contenteditable data-id="' + row.id + '" data-parent-id="' + parentId + '">' + row.text + '</th><td>' + expense + '</td></tr>';
+							var row = result.rows.item(i);
 							
-							parentId = row.id;
+							lines[row.type].push(row);
 						};
 						
-						budgetTable.empty().append( html );
+						lines.outcome.sort( _sortBudgetLines );
+						lines.income.sort( _sortBudgetLines );
+						
+						
+						callback && callback(lines);
 						
 						jQuery.event.trigger('BUDGET_LOADED', {budget_id: budget_id});
 					}, Core.dbErrorHandler);
@@ -209,14 +211,25 @@
 				return 0;
 			},
 			getTotal: function () {
-				var total = 0,
-					numberCol = $('#budget tbody').find('td');
-
-				numberCol.each( function () {
-					total += parseFloat( $(this).text() );
+				var outcomeCol = $('div.outcome tbody', $('#budgetTables')).find('td'),
+					incomeCol = $('div.income tbody', $('#budgetTables')).find('td'),
+					
+					amounts = {
+						incomeTotal: 0,
+						outcomeTotal: 0,
+						diff: 0
+					};
+				
+				incomeCol.each( function () {
+					amounts.incomeTotal += parseFloat( $(this).text() );
+				});
+				outcomeCol.each( function () {
+					amounts.outcomeTotal += parseFloat( $(this).text() );
 				});
 				
-				return total;
+				amounts.diff = amounts.incomeTotal - amounts.outcomeTotal;
+				
+				return amounts;
 			}
 		};
 		

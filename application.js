@@ -57,6 +57,31 @@ $(document).bind('ALL_MODULES_LOADED', function () {
  			}
 	 	});
 	};
+	
+	var loadBudgetCallback = function () {
+		var outcomesTable = $('#budgetTables div.outcome').find('tbody'),
+			incomesTable = $('#budgetTables div.income').find('tbody'),
+			
+			makeHtml = function (rows, type) {
+				var html = '', parentId = 0;
+				for (i = 0; i < rows[type].length; i++) {
+					var row = rows[type][i],
+						expense = Budget.parseExpense( row.text );
+						
+					html = html + '<tr><th contenteditable data-id="' + row.id + '" data-parent-id="' + parentId + '">' + row.text + '</th><td>' + expense + '</td></tr>';
+					
+					parentId = row.id;
+				}
+				
+				return html;
+			};
+		
+		return function (rows) {
+			outcomesTable.empty().append( makeHtml(rows, 'outcome') );
+			incomesTable.empty().append( makeHtml(rows, 'income') );
+		}
+	}();
+	
 
 	/*
 	 * Navigation */
@@ -75,7 +100,7 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 			switch (action) {
 				case 'loadbudget':
 					View.setActiveView( view );
-					Budget.loadBudget( elem.attr('data-budget-id') );
+					Budget.loadBudget( elem.attr('data-budget-id'), loadBudgetCallback );
 					break;
 				case 'loadlog':
 					View.setActiveView( view );
@@ -105,7 +130,7 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 		
 		$( html ).appendTo(budgetList);
 		
-		Budget.loadBudget( localStorage.getItem('loadedBudget') || 1 );
+		Budget.loadBudget( localStorage.getItem('loadedBudget') || 1 , loadBudgetCallback );
 		
 		View.setActiveView('budget');
 	}; 
@@ -131,13 +156,13 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 					case 'delete':
 						Budget.removeBudget(budgetId, function () {
 							Budget.getBudgets( refreshBudgetList );
-							Budget.loadBudget( loadNewBudgetId );
+							Budget.loadBudget( loadNewBudgetId, loadBudgetCallback );
 						});
 						break;
 					case 'log':
 						Budget.logBudget(budgetId, function () {
 							Budget.getBudgets( refreshBudgetList );
-							Budget.loadBudget( loadNewBudgetId );
+							Budget.loadBudget( loadNewBudgetId, loadBudgetCallback );
 						});
 						break;
 				}
@@ -254,32 +279,33 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 	})();
 	
 	/*
-	 * Add expense */
+	 * Add budget row */
 	( function () {
-		var newCalcForm = $('#newCalculation'),
-			budgetTable = $('#budget');
+		var addRowContainer = $('#addRowForms');
+			budgetTables = $('#budgetTables').children('div');
 		
-		budgetTable.find('tbody').bind('LINE_ADDED', function (e, data) {
+		budgetTables.find('tbody').bind('LINE_ADDED_TO_BUDGET', function (e, data) {
 			var tbody = $(this),
 				template = '<tr><th contenteditable data-id="{id}">{text}</th><td>{calcRes}</td></tr>',
 				
 				res = Budget.parseExpense(data.text);
 			
-			var elem = $(templateStr(template, { id: data.newId, text: data.text, calcRes: res }));
+			var elem = $( templateStr(template, { id: data.newId, text: data.text, calcRes: res }) );
 			tbody.append( elem );
 			elem.children('th').attr('data-parent-id', elem.prev().children('th').attr('data-id') || 0);
 		});
 		
-		newCalcForm.bind('submit', function (e) {
+		addRowContainer.find('form').bind('submit', function (e) {
 			e.preventDefault();
 			
 			var calcField = $(this).find('input[name="calculation"]'),
 				value = calcField.val(),
-				parId = $('tbody', budgetTable).find('tr:last th').attr('data-id') || 0;
+				type = $(this).attr('data-row-type'),
+				parId = $('tbody', budgetTables.filter('.' + type)).find('tr:last th').attr('data-id') || 0;
 							
 			calcField.val('');
-			
-			Budget.addLine( value, parId );
+									
+			Budget.addLine( type, value, parId );
 		});
 	})();
 	
@@ -415,25 +441,43 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 	  * Total amount update */
 	 (function () {
 	 	var totalTable = $('#totalAmount'),
-	 		totalFixed = $('#totalFixed').find('.amount');
+	 		totalFixed = $('#totalFixed').find('.amount'),
+	 		
+	 		template = '<dl> \
+	 						<dt>Outcome total</dt> \
+	 							<dd>{out}</dd> \
+	 						<dt>Income total</dt> \
+	 							<dd>{in}</dd> \
+	 						<dt>Difference</dt> \
+	 							<dd class="{class}">{diff}</dd> \
+	 					</dl>';
 	 	
 	 	totalTable.bind('BUDGET_LOADED LINE_ADDED', function () {
-	 		totalTable.add(totalFixed).text( Budget.getTotal() );
+	 		var values = Budget.getTotal(),
+	 			html = templateStr(template, {
+	 				'out': values.outcomeTotal,
+	 				'in': values.incomeTotal,
+	 				'diff': values.diff,
+	 				'class': values.diff > 0 ? 'positive' : 'negative'
+	 			});
+	 		totalFixed.html( html );
 	 	});
 	 })();
 	 
 	 /*
 	  * Edit budget lines */
 	 ( function () {
-	 	var budget = $('#budget');
+	 	var budgetTables = $('#budgetTables');
 
-	 	budget.delegate('th', 'keydown focusout', function (e) {
+	 	budgetTables.delegate('th', 'keydown focusout', function (e) {
 	 		var elem = $(this),
 	 			value = elem.text();
 	 			 		
 	 		switch (e.type) {
 	 			case 'focusout':
 	 				Budget.updateLine( value, elem.attr('data-id') );
+	 				
+	 				// Todo update parser col
 	 				break;
 	 			case 'keydown':
 	 				if (e.keyCode === 13 && !e.shiftKey) {
@@ -459,10 +503,10 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 			return clone;
 		};
 
-	 	$('#budget').bind('BUDGET_LOADED', function () {
+	 	$('#budgetTables').find('table').bind('BUDGET_LOADED', function () {
 	 		var movedFromNextElem, movedFromPrevElem, movedElem;
 	 		
-	 		$('#budget').find('tbody').sortable({
+	 		$(this).find('tbody').sortable({
 	 			helper: fixHelper,
 	 			axis: 'y',
 	 			
@@ -484,12 +528,16 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 					movedTh.attr('data-parent-id', movedToPrevElem.attr('data-id') || 0); // New location of moved elem
 					
 					movedToNextElem.attr('data-parent-id', movedTh.attr('data-id')); // Moved to next elem
+					
+					
 										
 					var newPositions = [
 						{ id: parseInt(movedFromNextElem.attr('data-id')), setParent: parseInt(movedFromPrevElem.attr('data-id')) || 0 },
 						{ id: parseInt(movedTh.attr('data-id')), setParent: parseInt(movedToPrevElem.attr('data-id')) || 0 },
 						{ id: parseInt(movedToNextElem.attr('data-id')), setParent: parseInt(movedTh.attr('data-id')) }
 					];
+					
+					console.log(newPositions);
 					
 					Budget.updateLinePositions( newPositions );
 	 			}

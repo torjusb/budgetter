@@ -288,40 +288,46 @@ input[type="submit"] {
 			}
 		}
 		
-		#newCalculation {
+		#addRowForms {
 			padding: 10px;
 			background: #eee;
 			border-bottom: 1px solid #888;
+			overflow: hidden;
 			-webkit-box-shadow: inset rgba(0, 0, 0, .2) 0 0 3px;
 			
-			input[type="text"] {
-				padding: 7px;
-				-webkit-box-sizing: border-box;
-				-webkit-box-shadow: inset rgba(0, 0, 0, .2) 1px 1px 2px;
-				font-size: 14px;
-				width: 400px;
-				border: 1px solid #888;
-				.border-radius(3px);
-				
-				&:focus {
-					outline: none;
-					border-color: hsla(205, 100%, 50%, 1); 
-					-webkit-box-shadow: hsla(205, 100%, 50%, 1) 0 0 3px;
+			form {
+				width: 50%;
+				float: left;
+							
+				input[type="text"] {
+					padding: 7px;
+					-webkit-box-sizing: border-box;
+					-webkit-box-shadow: inset rgba(0, 0, 0, .2) 1px 1px 2px;
+					font-size: 14px;
+					width: 400px;
+					border: 1px solid #888;
+					.border-radius(3px);
+					
+					&:focus {
+						outline: none;
+						border-color: hsla(205, 100%, 50%, 1); 
+						-webkit-box-shadow: hsla(205, 100%, 50%, 1) 0 0 3px;
+					}
 				}
-			}
-			input[type="submit"] {
-				padding: 7px 15px;
-				font-size: 14px;
-				color: #fff;
-				border: 0;
-				background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#30BAFF), to(#1C6E96));
-				cursor: pointer;
-				.border-radius(3px);
-				
-				&:active {
-					-webkit-box-shadow: inset rgba(0, 0, 0, .5) 0 2px 3px;
-					position: relative;
-					top: 1px;
+				input[type="submit"] {
+					padding: 7px 15px;
+					font-size: 14px;
+					color: #fff;
+					border: 0;
+					background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#30BAFF), to(#1C6E96));
+					cursor: pointer;
+					.border-radius(3px);
+					
+					&:active {
+						-webkit-box-shadow: inset rgba(0, 0, 0, .5) 0 2px 3px;
+						position: relative;
+						top: 1px;
+					}
 				}
 			}
 		}
@@ -330,41 +336,59 @@ input[type="submit"] {
 			height: 500px;
 			position: relative;
 			
-			#budget {
-				width: 100%;
-				
-				#col1 {
-					width: 300px;
-					min-width: 200px;
-					max-width: 400px;
-				}
-				
-				th, td {
-					border-bottom: 1px solid #ddd;
-					font-weight: 400;
-					font-size: 14px;
-					line-height: 1.4;
-					vertical-align: top;
-					padding: 5px 10px;
-				}
-				tbody {
-					cursor: move;
-				}
-				
-				.ui-drag-helper {
-					th {
-						border-right: 0!important;
+			#budgetTables {
+
+				div {
+					width: 50%;
+					
+					&.outcome { float: left; }
+					&.income { float: right; }									
+					
+					&:first-child { border-right: 1px solid #ddd; }
+					&:last-child {
+						border-left: 1px solid #ddd;
+						position: relative;
+						left: -1px;
+						margin-right: -1px;
+					}
+					
+					table {
+						width: 100%;
+					
+						.col1 {
+							width: 300px;
+							min-width: 200px;
+							max-width: 400px;
+						}
+						
+						th, td {
+							border-bottom: 1px solid #ddd;
+							font-weight: 400;
+							font-size: 14px;
+							line-height: 1.4;
+							vertical-align: top;
+							padding: 5px 10px;
+						}
+						tbody {
+							cursor: move;
+						}
+						
+						.ui-drag-helper {
+							th {
+								border-right: 0!important;
+							}
+						}
+						
+						tbody th {
+							width: 150px;
+							text-align: right;
+							border-right: 1px solid #888;
+							cursor: text!important;
+						}
+						
+						tfoot { display: none; }
 					}
 				}
-				
-				tbody th {
-					width: 150px;
-					text-align: right;
-					border-right: 1px solid #888;
-					cursor: text!important;
-				}
-				
-				tfoot { display: none; }
 			}
 			
 			#budget-col-sizer {
@@ -384,8 +408,6 @@ input[type="submit"] {
 		}
 		
 		#totalFixed {
-			position: fixed;
-			bottom: 0;
 			height: 30px;
 			background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#EDEDED), to(#D9D9D9));
 			font-size: 14px;
@@ -395,17 +417,30 @@ input[type="submit"] {
 			width: 100%;
 			-webkit-box-shadow: rgba(0, 0, 0, .1) 0 -1px 2px, inset #fff 0 1px 1px;
 			
-			p {
-				float: left;
+			dl {
 				padding: 0 10px;
 				line-height: 30px;
 				
-				&:first-of-type {
-					text-align: right;
-					margin-left: 1px;
-					width: 300px;
-					border-right: 1px solid #888;
-					-webkit-box-sizing: border-box;
+				dt, dd { display: inline; }
+				
+				dt {
+					font-weight: 700;
+					
+					&:after {
+						content: ':';
+					}
+				}
+				
+				dd {
+					margin-right: 40px;
+					font-style: italic;
+					
+					&.negative {
+						color: #A61414;
+					}
+					&.positive {
+						color: #1C8835;
+					}
 				}
 			}
 		}
