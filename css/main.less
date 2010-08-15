@@ -466,30 +466,29 @@ input[type="submit"] {
 				list-style: none;
 				width: 100%;
 				-webkit-box-sizing: border-box;
-				border: 1px solid #ddd;
-				background: #eee;
-				.border-radius;
+				
+				
+				
 				
 				li {
 					padding: 10px;
+					border: 1px solid #ddd;
+					.border-radius;
+					margin-bottom: 5px;
 					font-size: 14px;
 					border-bottom: 1px solid #ddd;
 					cursor: pointer;
+					background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#F5F5F5), to(#F0F0F0));
+					
 					
 					&:hover {
+						-webkit-box-shadow: rgba(0, 0, 0, .3) 0 1px 3px;	
+						border-color: #999999;
 						
-						&:last-child {
-							-webkit-border-bottom-right-radius: 5px;
-							-webkit-border-bottom-left-radius: 5px;
+						&.expanded {
+							border-color: #ddd;
+							-webkit-box-shadow: none;
 						}
-						&:first-child {
-							-webkit-border-top-right-radius: 5px;
-							-webkit-border-top-left-radius: 5px;
-						}
-					}
-					
-					&:last-of-type {
-						border: 0;
 					}
 					
 					button {

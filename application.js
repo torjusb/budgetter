@@ -163,7 +163,8 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 		var list = $('#logbookView').find('ul.budgetList'),
 			
 			rowTpl = '<tr><td>{inText}</td><td class="res">{inCalc}</td><td>{outText}</td><td class="res">{outCalc}</td></tr>'
-			footTpl = '<tr><th colspan="3">{text}</th><td class="{class}">{sum}</td></tr>';
+			footTpl = '<th>{text}</th><td>{sum}</td>',
+			diffTpl = '<tr><th colspan="3">{text}</th><td class="{class}">{sum}</td></tr>';
 	
 		list.delegate('li', 'click', function (e) {
 			var elem = $(this),
@@ -223,9 +224,11 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 				
 				// Make tfoot
 				diff = parseFloat(incomeTotal - outcomeTotal);
-				footHtml += templateStr(footTpl, { text: 'Income total', sum: incomeTotal });
-				footHtml += templateStr(footTpl, { text: 'Outcome total', sum: outcomeTotal });
-				footHtml += templateStr(footTpl, { text: 'Difference', sum: diff || '0', 'class': diff >= 0 ? 'positive' : 'negative' });
+				footHtml += '<tr>';
+				footHtml += templateStr(footTpl, { text: 'Total', sum: incomeTotal });
+				footHtml += templateStr(footTpl, { text: 'Total', sum: outcomeTotal });
+				footHtml += '</tr>';
+				footHtml += templateStr(diffTpl, { text: 'Difference', sum: diff || '0', 'class': diff >= 0 ? 'positive' : 'negative' });
 				
 				tfoot.append ( footHtml );
 				
