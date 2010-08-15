@@ -7,10 +7,12 @@
 	<script src="js/less-1.0.33.min.js" type="text/javascript"></script>
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 	<script src="js/jquery-ui-1.8.4.custom.min.js"></script>
+	<script src="js/modernizr-1.5.min.js"></script>
 <!--<script src="http://github.com/jamespadolsey/jQuery-Lint/raw/master/jquery.lint.js"></script>-->
 	<link href="http://fonts.googleapis.com/css?family=Droid+Sans:regular,bold" rel="stylesheet" />
 	<script src="js/math-string-parser.js"></script>
 	<script src="js/core.js"></script>
+	<script src="js/installer.js"></script>
 	<script src="js/budget.js"></script>
 	<script src="js/view.js"></script>
 	<script src="application.js"></script>
@@ -18,162 +20,8 @@
 	    less.env = "development";
 	    less.watch();
 	    less.poll = 150;
-	    jQuery.event.props.push("dataTransfer");
-	    	    
-	    jQuery( function ($) {
-	    	var Menu = _budgetter.getModule('menu'),
-	    		Budget = _budgetter.getModule('budget'),
-	    		Modal = _budgetter.getModule('modal');	
-/*
-			
-			$( Menu.getContainer ).delegate('button[data-item-modal="true"]', 'click', function () {
-				var pointer = $(this).attr('data-modal-window');
-				$.fancybox({
-					content: $('#' + pointer).clone().show()
-				});
-			});
-*/
-			
-/*
-			$('#newBudget').submit( function (e) {
-				e.preventDefault();
-				
-				var budgetName = $('input[type="text"]', this).val();
-				
-				Budget.newBudget( budgetName );
-			});
-*/
-			
-			
-/*
-			var colMover = $('#col-mover'),
-				budgetCol = $('#col1'),
-				mouseKeyDown = false;
-			
-			$(document).bind('mousemove', function (e) {
-				if (mouseKeyDown) {
-					e.preventDefault();
-					
-					var x = e.clientX;
-					if (x < 250) {
-						return false;
-					}
-					colMover.css('left', x);
-					budgetCol.css('width', x);
-				}
-			});
-			
-			colMover.bind('mousedown mouseup', function (e) {
-				mouseKeyDown = e.type === 'mousedown' ? true : false;
-			});
-
-			$('table').delegate('tr', 'dragstart', function (e) {
-				e.dataTransfer.effectAllowed = 'move';
-				e.dataTransfer.setData('Text', $(this).children('th').attr('data-id'));
-				console.log(e);
-			});
-			$('tbody').bind('dragover dragenter', function (e) {
-				e.preventDefault();
-			});
-			$('tbody').bind('drop', function (e) {
-				console.log(e);
-			});
-*/
-		});
 	</script>
 </head>
 <body>
-	<header id="head">
-		<h1>Budgetter</h1>
-		<menu id="menuContainer"></menu>
-	</header>
-	<div id="main">
-		<div id="left">
-			<nav>
-				<h1>Your budgets</h1>
-				<ul id="budgets"></ul>
-				<form id="addBudget">
-					<p><input type="text" name="budget-name" placeholder="Budget name" /></p>
-					<input type="submit" value="Add" />
-				</form>
-			</nav>
-			<nav>
-				<li id="openTrash" data-action="loadtrash" data-view="trashcan">Trashcan</li>
-				<li id="openLog" data-action="loadlog" data-view="logbook">Logbook</li>
-			</nav>
-		</div>
-		<div id="right">
-			<div id="budgetView" class="view">
-				<div id="budgetInfo">
-					<h1 contenteditable>Budget name</h1>
-					<p class="description" contenteditable>Description</p>
-				</div>
-				<div id="addRowForms">
-					<form class="outcome" data-row-type="outcome">
-						<input type="text" name="calculation" placeholder="Add outcome" />
-						<input type="submit" value="Add" />
-					</form>
-					<form class="income" data-row-type="income">
-						<input type="text" name="calculation" placeholder="Add income" />
-						<input type="submit" value="Add" />
-					</form>
-				</div>
-				<div class="scroll-area">
-					<div id="budgetTables">
-						<div class="outcome">
-							<table class="budget">
-								<colgroup>
-									<col class="col1" />
-								</colgroup>
-								<tfoot>
-									<tr>
-										<th>Total</th>
-										<td id="totalAmount"></td>
-									</tr>
-								</tfoot>
-								<tbody>
-								</tbody>
-							</table>
-						</div>
-						<div class="income">
-							<table class="budget">
-								<colgroup>
-									<col class="col1" />
-								</colgroup>
-								<tbody>
-								</tbody>
-							</table>
-						</div>
-					</div>
-				</div>
-				<div id="totalFixed">
-					<p class="amount"></p>
-				</div>
-			</div>
-			
-			<div id="logbookView" class="view inactiveView">
-				<div class="scroll-area">
-					<ul class="budgetList log"></ul>
-					<p class="empty-list">No logged items.</p>
-				</div>
-			</div>
-			
-			<div id="trashView" class="view inactiveView">
-				<div class="scroll-area">
-					<ul class="budgetList"></ul>
-					<p class="empty-list">No items in the trash.</p>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div id="settingsWrap">
-		<div id="db" style="display:none;">adsad</div>
-		<form id="newBudget" style="display:none;"><input type="text" name="budget_name" placeholder="Budget name" /></form>
-	</div>
-	<menu id="contextMenu" type="context">
-		<li data-menu-action="rename"><span>Rename</span></li>
-		<li data-menu-action="log"><span>Log budget</span></li>
-		<li data-menu-action="delete"><span>Delete</span></li>
-	</menu>
 </body>
 </html>

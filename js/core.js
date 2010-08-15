@@ -1,14 +1,8 @@
 (function (window) {
 	var Core = function () {		
-		var db = {
-			setup: function () {},
-			open: function () {
-				return window.openDatabase('Budgetter', '0.1', '', 200000);
-			}
-		},
-		_db = db.open(),
-		modules = [], loadedModules = {};
-		
+		var _db,
+			modules = [], loadedModules = {};
+
 		return {
 			executeSql: function (sql, data, callback) {
 				_db.transaction( function (tx) {
@@ -20,6 +14,9 @@
 				});
 			},
 			getDB: function () {
+				if (!_db) {
+					_db = window.openDatabase('Budgetter', '0.1', '', 200000);
+				}
 				return _db;
 			},
 			dbErrorHandler: function (e) {
@@ -51,7 +48,7 @@
 		};
 	}();
 		
-	jQuery(document).ready( Core.loadAllModules );
+	//jQuery(document).ready( Core.loadAllModules );
 	
 	window._budgetter = Core;
 })(window);

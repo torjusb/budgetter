@@ -1,0 +1,88 @@
+<header id="head">
+	<h1>Budgetter</h1>
+	<menu id="menuContainer"></menu>
+</header>
+<div id="main">
+	<div id="left">
+		<nav>
+			<h1>Your budgets</h1>
+			<ul id="budgets"></ul>
+			<form id="addBudget">
+				<p><input type="text" name="budget-name" placeholder="Budget name" /></p>
+				<input type="submit" value="Add" />
+			</form>
+		</nav>
+		<nav>
+			<li id="openTrash" data-action="loadtrash" data-view="trashcan">Trashcan</li>
+			<li id="openLog" data-action="loadlog" data-view="logbook">Logbook</li>
+		</nav>
+	</div>
+	<div id="right">
+		<div id="budgetView" class="view">
+			<div id="budgetInfo">
+				<h1 contenteditable>Budget name</h1>
+				<p class="description" contenteditable>Description</p>
+			</div>
+			<div id="addRowForms">
+				<form class="outcome" data-row-type="outcome">
+					<input type="text" name="calculation" placeholder="Add outcome" />
+					<input type="submit" value="Add" />
+				</form>
+				<form class="income" data-row-type="income">
+					<input type="text" name="calculation" placeholder="Add income" />
+					<input type="submit" value="Add" />
+				</form>
+			</div>
+			<div class="scroll-area">
+				<div id="budgetTables">
+					<div class="outcome">
+						<table class="budget">
+							<colgroup>
+								<col class="col1" />
+							</colgroup>
+							<tfoot>
+								<tr>
+									<th>Total</th>
+									<td id="totalAmount"></td>
+								</tr>
+							</tfoot>
+							<tbody>
+							</tbody>
+						</table>
+					</div>
+					<div class="income">
+						<table class="budget">
+							<colgroup>
+								<col class="col1" />
+							</colgroup>
+							<tbody>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+			<div id="totalFixed">
+				<p class="amount"></p>
+			</div>
+		</div>
+		
+		<div id="logbookView" class="view inactiveView">
+			<div class="scroll-area">
+				<ul class="budgetList log"></ul>
+				<p class="empty-list">No logged items.</p>
+			</div>
+		</div>
+		
+		<div id="trashView" class="view inactiveView">
+			<div class="scroll-area">
+				<ul class="budgetList"></ul>
+				<p class="empty-list">No items in the trash.</p>
+			</div>
+		</div>
+	</div>
+</div>
+<menu id="contextMenu" type="context">
+	<li data-menu-action="rename"><span>Rename</span></li>
+	<li data-menu-action="log"><span>Log budget</span></li>
+	<li data-menu-action="delete"><span>Delete</span></li>
+</menu>

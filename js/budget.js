@@ -1,7 +1,5 @@
 (function () {
-	var Core = _budgetter,
-		db 	 = Core.getDB();
-		
+	var Core = _budgetter;		
 		
 	var templateStr = function (str, data) {
 		return str.replace(/\{([a-zA-Z1-9]+)\}/g, function (match, tag) {
@@ -13,6 +11,7 @@
 	 * API */
 	var Budget = function () {
 		var loadedBudget = localStorage.getItem('loadedBudget'),
+			db = Core.getDB();
 		
 			calculations = [],
 			
@@ -198,7 +197,9 @@
 				
 				db.transaction( function (tx) {
 					tx.executeSql('SELECT description FROM budgets WHERE id = ?', [budget_id], function (tx, res) {
-						callback(res.rows.item(0).description);
+						if (res.rows.length > 0) {
+							callback && callback(res.rows.item(0).description);
+						}
 					});
 				}, Core.dbErrorHandler);
 			},
@@ -214,7 +215,9 @@
 				
 				db.transaction( function (tx) {
 					tx.executeSql('SELECT name FROM budgets WHERE id = ?', [budget_id], function (tx, res) {
-						callback(res.rows.item(0).name);
+						if (res.rows.length > 0) {
+							callback && callback(res.rows.item(0).name);
+						}
 					});
 				}, Core.dbErrorHandler);
 			},

@@ -552,7 +552,6 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 	 		scrollArea, offset, exclude
 	 		
 	 		resizeScrollArea = function () {
-	 			console.log('mm');
 	 			scrollArea.height((win.height() - offset - exclude));	
 	 		};
 	 		
