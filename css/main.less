@@ -333,7 +333,6 @@ input[type="submit"] {
 		}
 		
 		#budgetView {
-			height: 500px;
 			position: relative;
 			
 			#budgetTables {
@@ -475,6 +474,19 @@ input[type="submit"] {
 					padding: 10px;
 					font-size: 14px;
 					border-bottom: 1px solid #ddd;
+					cursor: pointer;
+					
+					&:hover {
+						
+						&:last-child {
+							-webkit-border-bottom-right-radius: 5px;
+							-webkit-border-bottom-left-radius: 5px;
+						}
+						&:first-child {
+							-webkit-border-top-right-radius: 5px;
+							-webkit-border-top-left-radius: 5px;
+						}
+					}
 					
 					&:last-of-type {
 						border: 0;
@@ -484,6 +496,42 @@ input[type="submit"] {
 						float: right;
 						position: relative;
 						top: -4px;
+					}
+					
+					table {
+						display: none;
+						background: rgba(255, 255, 255, .5);
+						width: 100%;
+						border: 1px solid #DCDCDC;
+						border-collapse: collapse;
+						
+						thead {
+							th {
+								text-align: center;
+							}
+						}
+						
+						td, th {
+							text-align: left;
+							padding: 5px;
+							border: 1px solid #C9C9C9;
+							width: 25%;
+							-webkit-box-sizing: border-box;
+						}
+						
+						tfoot {
+							border-top: 2px solid #C9C9C9;
+							th {
+								text-align: right;
+							}
+							
+							td.negative { color: #A61414; }
+							td.positive { color: #1C8835; }
+						}
+					}
+					
+					&.expanded table {
+						display: table;
 					}
 				}
 			}

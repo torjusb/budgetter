@@ -94,7 +94,6 @@
 					}, Core.dbErrorHandler);
 				});
 			},
-			// TODO: Rewrite to use callback insted?
 			loadBudget: function (budget_id, callback) {
 				localStorage.setItem('loadedBudget', budget_id);
 				loadedBudget = budget_id;
@@ -126,8 +125,26 @@
 					}, Core.dbErrorHandler);
 				});
 			},
+			getBudgetLines: function (budget_id, callback) {
+				budget_id = budget_id || loadedBudget;
+				
+				db.transaction( function (tx) {
+					tx.executeSql('SELECT * FROM lines WHERE budget_id = :budget_id', [budget_id], function (tx, res) {
+						var lines = [];
+						
+						for (i = 0; i < res.rows.length; i++) {
+							var row = res.rows.item(i);
+							
+							lines.push(row);
+						}
+						
+						lines.sort( _sortBudgetLines );
+						
+						callback && callback( lines );
+					});
+				});
+			},
 			getBudgetsByStatus: function (status, callback) {
-				console.log(status.indexOf(_statuses));
 				if (_statuses.indexOf(status) === -1) {
 					throw new Error("Can't get budgets with status: " + status);
 				}
@@ -222,27 +239,6 @@
 				}
 
 				return 0;
-			},
-			getTotal: function () {
-				var outcomeCol = $('div.outcome tbody', $('#budgetTables')).find('td'),
-					incomeCol = $('div.income tbody', $('#budgetTables')).find('td'),
-					
-					amounts = {
-						incomeTotal: 0,
-						outcomeTotal: 0,
-						diff: 0
-					};
-				
-				incomeCol.each( function () {
-					amounts.incomeTotal += parseFloat( $(this).text() );
-				});
-				outcomeCol.each( function () {
-					amounts.outcomeTotal += parseFloat( $(this).text() );
-				});
-				
-				amounts.diff = amounts.incomeTotal - amounts.outcomeTotal;
-				
-				return amounts;
 			}
 		};
 		

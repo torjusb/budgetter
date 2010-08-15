@@ -32,6 +32,25 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 		});
 	};
 	
+	var getTotals = function (income_col, outcome_col) {
+		var amounts = {
+			income: 0,
+			outcome: 0,
+			diff: 0
+		};
+		
+		income_col.each( function () {
+			amounts.income += parseFloat( this.innerText );
+		});
+		outcome_col.each( function () {
+			amounts.outcome += parseFloat( this.innerText );
+		});
+		
+		amounts.diff = amounts.income - amounts.outcome;
+		
+		return amounts;
+	};
+	
 	
 	var loadInactiveBudgets = function (type) {
 	 	viewElem = View.getActiveView(),	 		
@@ -136,6 +155,84 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 				}
 	 		});
 	 	});
+	})();
+	
+	/*
+	 * Logbook - view budget */
+	( function () {
+		var list = $('#logbookView').find('ul.budgetList'),
+			
+			rowTpl = '<tr><td>{inText}</td><td class="res">{inCalc}</td><td>{outText}</td><td class="res">{outCalc}</td></tr>'
+			footTpl = '<tr><th colspan="3">{text}</th><td class="{class}">{sum}</td></tr>';
+	
+		list.delegate('li', 'click', function (e) {
+			var elem = $(this),
+
+				table = $('<table><thead><th colspan="2">Incomes</th><th colspan="2">Outcomes</th></thead></table>'),
+				tbody = $('<tbody />').appendTo(table),
+				tfoot = $('<tfoot />').appendTo(table),
+				
+				id = parseInt(elem.attr('data-id')),
+				bodyHtml = footHtml = '';
+			
+			if (elem.hasClass('expanded')) {
+				elem.removeClass('expanded');
+			} else {
+				elem.siblings().removeClass('expanded');
+				elem.addClass('expanded');
+			}
+							
+			if (!!elem.attr('data-loaded')) {
+				return;
+			}
+			
+			Budget.getBudgetLines(id, function (rows) {
+				var lines = {
+					income: [],
+					outcome: []
+				},
+				
+				incomeTotal = outcomeTotal = diff = 0;
+				
+				// Sort outcomes from incomes
+				for (i = 0; i < rows.length; i++) {
+					lines[rows[i].type].push( rows[i] );
+				}
+				
+				// Loop through all rows
+				for (i = 0; i < rows.length; i++) {						
+					var inRow = lines.income[i] || '',
+						outRow = lines.outcome[i] || '',
+						
+						inNum = Budget.parseExpense(inRow.text),
+						outNum = Budget.parseExpense(outRow.text);
+						
+					incomeTotal += inNum || 0;
+					outcomeTotal += outNum || 0;
+						
+					
+					bodyHtml += templateStr(rowTpl, {
+						inText: inRow.text || '',
+						inCalc: inNum,
+						outText: outRow.text || '',
+						outCalc: outNum
+					});
+				}
+				
+				tbody.append( bodyHtml );
+				
+				// Make tfoot
+				diff = parseFloat(incomeTotal - outcomeTotal);
+				footHtml += templateStr(footTpl, { text: 'Income total', sum: incomeTotal });
+				footHtml += templateStr(footTpl, { text: 'Outcome total', sum: outcomeTotal });
+				footHtml += templateStr(footTpl, { text: 'Difference', sum: diff || '0', 'class': diff >= 0 ? 'positive' : 'negative' });
+				
+				tfoot.append ( footHtml );
+				
+				table.appendTo(elem);
+				elem.attr('data-loaded', 1);
+			});
+		});
 	})();
 	
 	
@@ -452,7 +549,8 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 	 		scrollArea, offset, exclude
 	 		
 	 		resizeScrollArea = function () {
-	 			scrollArea.css('height', (win.height() - offset - exclude));	
+	 			console.log('mm');
+	 			scrollArea.height((win.height() - offset - exclude));	
 	 		};
 	 		
 	 	$(document).bind('NEW_VIEW_SET', function (e, data) {
@@ -494,6 +592,7 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 	 (function () {
 	 	var totalTable = $('#totalAmount'),
 	 		totalFixed = $('#totalFixed').find('.amount'),
+	 		budgetTables = $('#budgetTables'),
 	 		
 	 		template = '<dl> \
 	 						<dt>Outcome total</dt> \
@@ -505,7 +604,7 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 	 					</dl>';
 	 	
 	 	totalTable.bind('BUDGET_LOADED LINE_ADDED', function () {
-	 		var values = Budget.getTotal(),
+	 		var values = getTotals( $('div.income tbody', budgetTables).find('td'), $('div.outcome tbody', budgetTables).find('td') ),
 	 			html = templateStr(template, {
 	 				'out': values.outcomeTotal,
 	 				'in': values.incomeTotal,
@@ -589,7 +688,6 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 						{ id: parseInt(movedToNextElem.attr('data-id')), setParent: parseInt(movedTh.attr('data-id')) }
 					];
 					
-					console.log(newPositions);
 					
 					Budget.updateLinePositions( newPositions );
 	 			}
