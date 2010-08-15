@@ -681,19 +681,26 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 					movedTh.attr('data-parent-id', movedToPrevElem.attr('data-id') || 0); // New location of moved elem
 					
 					movedToNextElem.attr('data-parent-id', movedTh.attr('data-id')); // Moved to next elem
-					
-					
 										
 					var newPositions = [
 						{ id: parseInt(movedFromNextElem.attr('data-id')), setParent: parseInt(movedFromPrevElem.attr('data-id')) || 0 },
 						{ id: parseInt(movedTh.attr('data-id')), setParent: parseInt(movedToPrevElem.attr('data-id')) || 0 },
 						{ id: parseInt(movedToNextElem.attr('data-id')), setParent: parseInt(movedTh.attr('data-id')) }
-					];
-					
+					];				
 					
 					Budget.updateLinePositions( newPositions );
 	 			}
 	 		}).disableSelection();
 	 	});
+	})();
+	
+	/*
+	 * Print */
+	( function () {
+		var button = $('#print');
+		
+		button.bind('click', function () {
+			window.print();
+		});
 	})();
 });

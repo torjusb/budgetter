@@ -9,6 +9,7 @@ jQuery( function ($) {
 		startApplication = function () {
 			body.load('pages/application.html', function () {
 				Core.loadAllModules();
+				localStorage.setItem('app_installed', 1);
 			});
 		},
 		
@@ -53,7 +54,11 @@ jQuery( function ($) {
 			return true;
 		};
 		
-	if ( testFeatures(coreFeatures) ) {
-		install();
+	if (Modernizr.localstorage && !!localStorage.getItem('app_installed')) {
+		startApplication();
+	} else {
+		if ( testFeatures(coreFeatures) ) {
+			install();
+		}
 	};
 });
