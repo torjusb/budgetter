@@ -150,7 +150,6 @@
 					var obj = {};
 
 					tx.executeSql('SELECT * FROM budgets WHERE id = :budget_id', [budget_id], function (tx, res) {
-						console.log('bud',budget_id);
 						var row = res.rows.item(0);
 						
 						obj.name = row.name;
