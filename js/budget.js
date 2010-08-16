@@ -143,21 +143,18 @@
 					});
 				});
 			},
-			exportAsJSON: function (budget_id, callback) {
+			exportToJSON: function (budget_id, callback) {
 				budget_id = budget_id || loadedBudget;
 				
 				db.transaction( function (tx) {
-					var obj = {
-						
-					};
+					var obj = {};
 
 					tx.executeSql('SELECT * FROM budgets WHERE id = :budget_id', [budget_id], function (tx, res) {
 						console.log('bud',budget_id);
 						var row = res.rows.item(0);
 						
-						obj.id = row.id;
 						obj.name = row.name;
-						obj.description = row.description;
+						obj.description = row.description || '';
 						obj.status = row.status;
 						
 						tx.executeSql('SELECT * FROM lines WHERE budget_id = :budget_id', [budget_id], function (tx, res) {
@@ -165,18 +162,44 @@
 							for (i = 0; i < res.rows.length; i++) {
 								var row = res.rows.item(i),
 									line = {
-										id: row.id,
-										budget_id: row.budget_id,
-										parent_id: row.parent_id,
 										text: row.text,
 										type: row.type
 									};
 									
 								obj.lines.push(line);
 								
-								callback && callback(JSON.stringify(obj, null, '\t'));						
+								var json = JSON.stringify(obj, null, '\t');
+								
+								callback && callback(json);
 							}
 						});
+					}, Core.dbErrorHandler);
+				});
+			},
+			importFromJSON: function (json, callback) {
+				json = JSON.parse(json);
+				// tx.executeSql('INSERT INTO budgets (name) VALUES (?)', [budget_name], function (tx, res) {
+				db.transaction( function (tx) {				
+					tx.executeSql('INSERT INTO budgets (name, description, status) VALUES (:name, :description, :status)', [json.name, json.description, json.status], function (tx, res) {
+						var newBudgetId = res.insertId, i = 0;
+						
+						( function () {
+							var line = json.lines[i], parId = 0, caller = arguments.callee;
+							
+							if (i === json.lines.length) {
+								callback && callback(newBudgetId);
+								return;
+							}
+							tx.executeSql('INSERT INTO lines (text, type, parent_id, budget_id) VALUES (:text, :type, :parent_id, :budget_id)', [line.text, line.type, parId, newBudgetId], function (tx, res) {
+								parId = res.insertId;
+								i++;
+								caller();
+								return;
+							}, function (tx, err) {
+								console.log('err', err);
+							});
+						})();
+					
 					}, Core.dbErrorHandler);
 				});
 			},

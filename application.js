@@ -243,21 +243,21 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 	 * Budget navigation */
  	var budgetList = $('#budgets'),
 	
-	refreshBudgetList = function (budgets) {
-		var html, template = '<li data-budget-id="{id}" data-action="loadbudget" data-view="budget">{name}</li>';
-		
-		budgetList.empty();
-		
-		for (i = 0; i < budgets.length; i++) {
-			html += templateStr( template, { id: budgets[i].id, name: budgets[i].name } );
-		}
-		
-		$( html ).appendTo(budgetList);
-		
-		Budget.loadBudget( localStorage.getItem('loadedBudget') || 1 , loadBudgetCallback );
-		
-		View.setActiveView('budget');
-	}; 
+		refreshBudgetList = function (budgets) {
+			var html, template = '<li data-budget-id="{id}" data-action="loadbudget" data-view="budget">{name}</li>';
+			
+			budgetList.empty();
+			
+			for (i = 0; i < budgets.length; i++) {
+				html += templateStr( template, { id: budgets[i].id, name: budgets[i].name } );
+			}
+			
+			$( html ).appendTo(budgetList);
+			
+			Budget.loadBudget( localStorage.getItem('loadedBudget') || 1 , loadBudgetCallback );
+			
+			View.setActiveView('budget');
+		}; 
 	
 	( function () {
 		$(document).bind('click', function (e) {
@@ -715,15 +715,53 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 					content: res,
 					width: 500,
 					height: 500,
-					autoDimensions: false,
 					padding: 0,
+					autoDimensions: false,
+					overlayShow: false,
 					onComplete: function () {
-						Budget.exportAsJSON(null, function (json) {
+						Budget.exportToJSON(null, function (json) {
 							$('#fancybox-wrap').find('textarea').val( json )
 						});
 					}
 				});
 			}, 'html');
+		});
+		
+		$('#fancybox-wrap').delegate('textarea', 'focus', function (e) {
+			e.preventDefault();
+			// $(this).select(); TODO: make it work
+		});
+	})();
+	
+	/*
+	 * Import budget */
+	( function () {
+		var button = $('#import_budget');
+		
+		button.bind('click', function () {
+			$.get('ajax/import_budget.html', function (res) {
+				$.fancybox({
+					content: res,
+					width: 500,
+					height: 500,
+					padding: 0,
+					autoDimensions: false,
+					overlayShow: false
+				});
+			});
+		});
+		
+		$('#fancybox-wrap').delegate('#import_budget_form', 'submit', function (e) {
+			e.preventDefault();
+			
+			var json = $('textarea[name="json"]', this).val();
+			
+			Budget.importFromJSON(json, function (budgetId) {
+				Budget.getBudgets( refreshBudgetList );
+				Budget.loadBudget( budgetId );
+				
+				budgetList.children().removeClass('selected').filter('li[data-budget-id="' + budgetId + '"]').addClass('selected');
+			});
 		});
 	})();
 });
