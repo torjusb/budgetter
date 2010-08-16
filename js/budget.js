@@ -174,7 +174,7 @@
 									
 								obj.lines.push(line);
 								
-								callback && callback(JSON.stringify(obj));						
+								callback && callback(JSON.stringify(obj, null, '\t'));						
 							}
 						});
 					}, Core.dbErrorHandler);
