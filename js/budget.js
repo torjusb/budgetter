@@ -143,6 +143,43 @@
 					});
 				});
 			},
+			exportAsJSON: function (budget_id, callback) {
+				budget_id = budget_id || loadedBudget;
+				
+				db.transaction( function (tx) {
+					var obj = {
+						
+					};
+
+					tx.executeSql('SELECT * FROM budgets WHERE id = :budget_id', [budget_id], function (tx, res) {
+						console.log('bud',budget_id);
+						var row = res.rows.item(0);
+						
+						obj.id = row.id;
+						obj.name = row.name;
+						obj.description = row.description;
+						obj.status = row.status;
+						
+						tx.executeSql('SELECT * FROM lines WHERE budget_id = :budget_id', [budget_id], function (tx, res) {
+							obj.lines = [];
+							for (i = 0; i < res.rows.length; i++) {
+								var row = res.rows.item(i),
+									line = {
+										id: row.id,
+										budget_id: row.budget_id,
+										parent_id: row.parent_id,
+										text: row.text,
+										type: row.type
+									};
+									
+								obj.lines.push(line);
+								
+								callback && callback(JSON.stringify(obj));						
+							}
+						});
+					}, Core.dbErrorHandler);
+				});
+			},
 			getBudgetsByStatus: function (status, callback) {
 				if (_statuses.indexOf(status) === -1) {
 					throw new Error("Can't get budgets with status: " + status);

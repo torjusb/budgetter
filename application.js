@@ -608,8 +608,8 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 	 	totalTable.bind('BUDGET_LOADED LINE_ADDED', function () {
 	 		var values = getTotals( $('div.income tbody', budgetTables).find('td'), $('div.outcome tbody', budgetTables).find('td') ),
 	 			html = templateStr(template, {
-	 				'out': values.outcomeTotal,
-	 				'in': values.incomeTotal,
+	 				'out': values.outcome,
+	 				'in': values.income,
 	 				'diff': values.diff,
 	 				'class': values.diff > 0 ? 'positive' : 'negative'
 	 			});
@@ -701,6 +701,29 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 		
 		button.bind('click', function () {
 			window.print();
+		});
+	})();
+	
+	/*
+	 * Export budget */
+	( function () {
+		var button = $('#export_budget');
+		
+		button.bind('click', function () {
+			$.get('ajax/export_budget.html', {}, function (res) {
+				$.fancybox({
+					content: res,
+					width: 500,
+					height: 500,
+					autoDimensions: false,
+					padding: 0,
+					onComplete: function () {
+						Budget.exportAsJSON(null, function (json) {
+							$('#fancybox-wrap').find('textarea').val( json )
+						});
+					}
+				});
+			}, 'html');
 		});
 	})();
 });
