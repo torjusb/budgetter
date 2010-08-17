@@ -206,8 +206,25 @@ input[type="submit"], input[type="button"] {
 				border-top: 1px solid #8C9297;
 				border-bottom: 1px solid #8C9297;
 				.box-shadow(inset rgba(255, 255, 255, .2) 0 1px 1px);
-				background-color: #A6B3BD;
 				background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#A6B3BD), to(#91a0af));
+			}
+		}
+		
+		.secondary {
+			li {
+				list-style: none;
+				padding-left: 10px;
+				
+				&:before {
+					background-image: url(gfx/icons.png);
+					background-repeat: no-repeat;
+					content: "";
+					padding-left: 25px;
+					height: 16px;				
+				}
+				
+				&#openTrash:before { background-position: 0 -25px; }
+				&#openLog:before { background-position: 0 0; }
 			}
 		}
 		
@@ -285,7 +302,7 @@ input[type="submit"], input[type="button"] {
 				float: right;
 				list-style: none;
 				
-				#import_budget {
+				#export_budget {
 					background: url(boxupload32.png) no-repeat center 5px;
 					text-indent: -9999px;
 					cursor: pointer;
@@ -293,12 +310,20 @@ input[type="submit"], input[type="button"] {
 					width: 32px;
 					border: 0;
 					
-					&:hover {
-						background-position: center -35px;
-					}
-					&:active {
-						background-position: center -75px;
-					}
+					&:hover { background-position: center -35px; }
+					&:active { background-position: center -75px; }
+				}
+				
+				#import_budget {
+					background: url(gfx/import.png) no-repeat center 5px;
+					text-indent: -9999px;
+					cursor: pointer;
+					height: 40px;
+					width: 32px;
+					border: 0;
+					
+					&:hover { background-position: center -35px; }
+					&:active { background-position: center -75px; }
 				}
 			}
 		}
