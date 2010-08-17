@@ -745,6 +745,7 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 					width: 500,
 					height: 500,
 					padding: 0,
+					scrolling: 'no',
 					autoDimensions: false,
 					overlayShow: false
 				});
