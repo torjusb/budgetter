@@ -21,13 +21,15 @@
 			},
 			setActiveView: function (id) {
 				_activeView = _views[id];
-				
+								
 				for (i in _views) {
 					_views[i].hide();
 				}
 				_activeView.show();
 				
 				jQuery.event.trigger('NEW_VIEW_SET', { view: _activeView });
+				
+				return View;
 			},
 			getActiveView: function () {
 				return _activeView;

@@ -9,6 +9,7 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 	View.addView('budget', $('#budgetView'))
 		.addView('trashcan', $('#trashView'))
 		.addView('logbook', $('#logbookView'))
+		.addView('nobudgets', $('#nobudgetsView'))
 		.setActiveView('budget');
 			
 	
@@ -75,6 +76,11 @@ $(document).bind('ALL_MODULES_LOADED', function () {
  				listElem.hide();
  			}
 	 	});
+	};
+	
+	var noBudgetsView = function () {
+		var view = View.setActiveView('nobudgets').getActiveView('nobudgets');
+	
 	};
 	
 	var loadBudgetCallback = function () {
@@ -245,7 +251,7 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 	
 		refreshBudgetList = function (budgets) {
 			var html, template = '<li data-budget-id="{id}" data-action="loadbudget" data-view="budget">{name}</li>';
-			
+					
 			budgetList.empty();
 			
 			for (i = 0; i < budgets.length; i++) {
@@ -254,8 +260,12 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 			
 			$( html ).appendTo(budgetList);
 			
-			Budget.loadBudget( localStorage.getItem('loadedBudget') || 1 , loadBudgetCallback );
+			if (budgets.length < 1) {
+				noBudgetsView();
+				return;
+			}
 			
+			Budget.loadBudget( localStorage.getItem('loadedBudget') || 1 , loadBudgetCallback );
 			View.setActiveView('budget');
 		}; 
 	
@@ -561,10 +571,12 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 	 		
 	 	$(document).bind('NEW_VIEW_SET', function (e, data) {
 	 		scrollArea = data.view.find('div.scroll-area');
-	 		offset = scrollArea.offset().top;
-	 		exclude = parseFloat(scrollArea.nextAll().outerHeight()) || 0;
-	 		
-	 		resizeScrollArea();
+	 		if (scrollArea.length > 0) {
+		 		offset = scrollArea.offset().top;
+		 		exclude = parseFloat(scrollArea.nextAll().outerHeight()) || 0;
+		 		
+		 		resizeScrollArea();
+		 	}
 	 	});
 	 		
 	 	
