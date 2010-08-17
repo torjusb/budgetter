@@ -12,7 +12,7 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 		.setActiveView('budget');
 			
 	
-	Budget.addCalculation(0, /\d+/, function (string, regex) {
+	Budget.addCalculation(0, /-?(?:0|[1-9]\d{0,2}(?:,?\d{3})*)(?:\.\d+)?/, function (string, regex) {
 		return parseFloat(string.match(regex));
 	});
 	Budget.addCalculation(50, /(\d+).*\sa\s(\d+)/, function (string, regex) {
@@ -46,7 +46,7 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 			amounts.outcome += parseFloat( this.innerText );
 		});
 		
-		amounts.diff = amounts.income - amounts.outcome;
+		amounts.diff = Math.round((amounts.income - amounts.outcome) * 100) / 100;
 		
 		return amounts;
 	};
@@ -86,8 +86,8 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 				for (i = 0; i < rows[type].length; i++) {
 					var row = rows[type][i],
 						expense = Budget.parseExpense( row.text );
-						
-					html = html + '<tr><th contenteditable data-id="' + row.id + '" data-parent-id="' + parentId + '"><input type="button" value="Remove">' + row.text + '</th><td>' + expense + '</td></tr>';
+												
+					html = html + '<tr><th contenteditable data-id="' + row.id + '" data-parent-id="' + parentId + '"><input type="button" value="Remove" title="Remove">' + row.text + '</th><td>' + expense + '</td></tr>';
 					
 					parentId = row.id;
 				}
@@ -410,9 +410,9 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 		
 		budgetTables.find('tbody').bind('LINE_ADDED_TO_BUDGET', function (e, data) {
 			var tbody = $(this),
-				template = '<tr><th contenteditable data-id="{id}"><input type="button" value="Remove" />{text}</th><td>{calcRes}</td></tr>',
+				template = '<tr><th contenteditable data-id="{id}"><input type="button" value="Remove" title="Remove" />{text}</th><td>{calcRes}</td></tr>',
 				
-				res = Budget.parseExpense(data.text);
+				res = Budget.parseExpense(data.text).toString();
 			
 			var elem = $( templateStr(template, { id: data.newId, text: data.text, calcRes: res }) );
 			tbody.append( elem );
@@ -426,6 +426,10 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 				value = calcField.val(),
 				type = $(this).attr('data-row-type'),
 				parId = $('tbody', budgetTables.filter('.' + type)).find('tr:last th').attr('data-id') || 0;
+			
+			if (value.trim().length < 1) {
+				return false;
+			}
 							
 			calcField.val('');
 									
@@ -620,15 +624,24 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 	 /*
 	  * Edit budget lines */
 	 ( function () {
-	 	var budgetTables = $('#budgetTables');
+	 	var budgetTables = $('#budgetTables'),
+	 		prevValue;
 
-	 	budgetTables.delegate('th', 'keydown focusout', function (e) {
+	 	budgetTables.delegate('th', 'keydown focusin focusout', function (e) {
 	 		var elem = $(this),
 	 			value = elem.text();
 	 			 		
 	 		switch (e.type) {
+	 			case 'focusin':
+	 				prevValue = value;
+	 				break;
 	 			case 'focusout':
-	 				Budget.updateLine( value, elem.attr('data-id') );
+	 				if (value.trim().length > 0) {
+	 					Budget.updateLine( value, elem.attr('data-id') );
+	 				} else {
+	 					elem.text ( prevValue );
+	 				}
+	 				prevValue = '';
 	 				
 	 				// Todo update parser col
 	 				break;
@@ -763,6 +776,14 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 				
 				budgetList.children().removeClass('selected').filter('li[data-budget-id="' + budgetId + '"]').addClass('selected');
 			});
+		});
+	})();
+	
+	/*
+	 * General fancybox */
+	( function () {
+		$('#fancybox-wrap').delegate('input.cancel', 'click', function () {
+			$.fancybox.close();
 		});
 	})();
 });

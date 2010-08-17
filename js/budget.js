@@ -296,7 +296,8 @@
 				for (y = 0; y < calculations.length; y++) {
 					var cal = calculations[y];
 					if (cal.match.test(text)) {
-						return cal.calculate(text, cal.match);
+						
+						return Math.round((cal.calculate(text, cal.match) || 0) * 100) / 100;
 					}
 				}
 
