@@ -21,7 +21,7 @@
 			},
 			setActiveView: function (id) {
 				_activeView = _views[id];
-								
+				
 				for (i in _views) {
 					_views[i].hide();
 				}

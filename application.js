@@ -9,8 +9,8 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 	View.addView('budget', $('#budgetView'))
 		.addView('trashcan', $('#trashView'))
 		.addView('logbook', $('#logbookView'))
-		.addView('nobudgets', $('#nobudgetsView'))
-		.setActiveView('budget');
+		.addView('nobudgets', $('#nobudgetView'))
+		//.setActiveView('budget');
 			
 	
 	Budget.addCalculation(0, /-?(?:0|[1-9]\d{0,2}(?:,?\d{3})*)(?:\.\d+)?/, function (string, regex) {
@@ -77,12 +77,7 @@ $(document).bind('ALL_MODULES_LOADED', function () {
  			}
 	 	});
 	};
-	
-	var noBudgetsView = function () {
-		var view = View.setActiveView('nobudgets').getActiveView('nobudgets');
-	
-	};
-	
+		
 	var loadBudgetCallback = function () {
 		var outcomesTable = $('#budgetTables div.outcome').find('tbody'),
 			incomesTable = $('#budgetTables div.income').find('tbody'),
@@ -106,6 +101,20 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 			incomesTable.empty().append( makeHtml(rows, 'income') );
 		}
 	}();
+	
+	var importBudgetFunc = function () {
+		$.get('ajax/import_budget.html', function (res) {
+			$.fancybox({
+				content: res,
+				width: 500,
+				height: 500,
+				padding: 0,
+				scrolling: 'no',
+				autoDimensions: false,
+				overlayShow: false
+			});
+		});
+	};
 	
 
 	/*
@@ -261,7 +270,7 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 			$( html ).appendTo(budgetList);
 			
 			if (budgets.length < 1) {
-				noBudgetsView();
+				View.setActiveView('nobudgets');
 				return;
 			}
 			
@@ -269,6 +278,8 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 			View.setActiveView('budget');
 		}; 
 	
+	/*
+	 * Context menu */
 	( function () {
 		$(document).bind('click', function (e) {
 			$('#contextMenu').hide();
@@ -290,7 +301,11 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 					case 'delete':
 						Budget.removeBudget(budgetId, function () {
 							Budget.getBudgets( refreshBudgetList );
-							Budget.loadBudget( loadNewBudgetId, loadBudgetCallback );
+							if (loadNewBudgetId) {
+								Budget.loadBudget( loadNewBudgetId, loadBudgetCallback );
+							} else {
+								View.setActiveView('nobudgets');
+							}
 						});
 						break;
 					case 'log':
@@ -395,7 +410,7 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 				
 			switch (e.type) {
 				case 'focusin':
-					
+					break;					
 				case 'focusout':
 					if (/^\s*$/.test(value)) {
 						field.text( 'Description' );
@@ -720,6 +735,32 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 	})();
 	
 	/*
+	 * No budgets view */
+	( function () {
+		var view = $('#nobudgetView');
+		
+		view.find('form').bind('submit', function (e) {
+			e.preventDefault();
+			
+			var nameInput = $('input[name="budget-name"]', this),
+				nameValue = nameInput.val();
+				
+			if (nameValue.trim().length < 1) {
+				return false;
+			}
+			
+			nameInput.val('');				 			 			
+	 		Budget.newBudget( nameValue );
+		});
+		
+		view.find('a.import_budget').bind('click', function (e) {
+			e.preventDefault();
+			
+			importBudgetFunc();
+		});
+	})();
+	
+	/*
 	 * Print */
 	( function () {
 		var button = $('#print');
@@ -763,19 +804,7 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 	( function () {
 		var button = $('#import_budget');
 		
-		button.bind('click', function () {
-			$.get('ajax/import_budget.html', function (res) {
-				$.fancybox({
-					content: res,
-					width: 500,
-					height: 500,
-					padding: 0,
-					scrolling: 'no',
-					autoDimensions: false,
-					overlayShow: false
-				});
-			});
-		});
+		button.bind('click', importBudgetFunc);
 		
 		$('#fancybox-wrap').delegate('#import_budget_form', 'submit', function (e) {
 			e.preventDefault();
