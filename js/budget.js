@@ -51,7 +51,9 @@
 				budget_id = budget_id || loadedBudget;
 				
 				db.transaction( function (tx) {
-					tx.executeSql('UPDATE lines SET text = ? WHERE id = ? AND budget_id = ?', [text, line_id, budget_id], null, Core.dbErrorHandler);
+					tx.executeSql('UPDATE lines SET text = ? WHERE id = ? AND budget_id = ?', [text, line_id, budget_id], function () {
+						jQuery.event.trigger('LINE_UPDATED');
+					}, Core.dbErrorHandler);
 				});
 			},
 			removeLine: function (line_id, positions, budget_id, callback) {
@@ -64,6 +66,8 @@
 						}
 						
 						callback && callback();
+						
+						jQuery.event.trigger('LINE_REMOVED');
 					}, Core.dbErrorHandler)
 				});
 			},

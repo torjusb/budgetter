@@ -636,7 +636,7 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 	 							<dd class="{class}">{diff}</dd> \
 	 					</dl>';
 	 	
-	 	totalTable.bind('BUDGET_LOADED LINE_ADDED', function () {
+	 	totalTable.bind('BUDGET_LOADED LINE_ADDED LINE_UPDATED LINE_REMOVED', function () {
 	 		var values = getTotals( $('div.income tbody', budgetTables).find('td'), $('div.outcome tbody', budgetTables).find('td') ),
 	 			html = templateStr(template, {
 	 				'out': values.outcome,
@@ -665,12 +665,13 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 	 			case 'focusout':
 	 				if (value.trim().length > 0) {
 	 					Budget.updateLine( value, elem.attr('data-id') );
+	 					
+	 					elem.next().text( Budget.parseExpense(value) );	 					
 	 				} else {
 	 					elem.text ( prevValue );
 	 				}
 	 				prevValue = '';
-	 				
-	 				// Todo update parser col
+
 	 				break;
 	 			case 'keydown':
 	 				if (e.keyCode === 13 && !e.shiftKey) {
