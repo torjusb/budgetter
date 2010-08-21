@@ -8,7 +8,7 @@
 			<h1>Your budgets</h1>
 			<ul id="budgets"></ul>
 			<form id="addBudget">
-				<p><input type="text" name="budget-name" placeholder="Budget name" /></p>
+				<p><input type="text" name="budget-name" placeholder="Budget name" tabindex="1" /></p>
 				<input type="submit" value="Add" />
 			</form>
 		</nav>
@@ -35,39 +35,31 @@
 				</menu>
 			</div>
 			<div id="addRowForms">
-				<form class="outcome" data-row-type="outcome">
-					<input type="text" name="calculation" placeholder="Add outcome" />
-					<input type="submit" value="Add" />
-				</form>
 				<form class="income" data-row-type="income">
-					<input type="text" name="calculation" placeholder="Add income" />
+					<input type="text" name="calculation" placeholder="Add income" tabindex="2" />
+					<input type="submit" value="Add" />
+				</form>			
+				<form class="outcome" data-row-type="outcome">
+					<input type="text" name="calculation" placeholder="Add outcome" tabindex="3" />
 					<input type="submit" value="Add" />
 				</form>
 			</div>
 			<div class="scroll-area">
 				<div id="budgetTables">
-					<div class="outcome">
-						<table class="budget">
-							<colgroup>
-								<col class="col1" />
-							</colgroup>
-							<tfoot>
-								<tr>
-									<th>Total</th>
-									<td id="totalAmount"></td>
-								</tr>
-							</tfoot>
-							<tbody>
-							</tbody>
-						</table>
-					</div>
 					<div class="income">
 						<table class="budget">
 							<colgroup>
 								<col class="col1" />
 							</colgroup>
-							<tbody>
-							</tbody>
+							<tbody></tbody>
+						</table>
+					</div>
+					<div class="outcome">
+						<table class="budget">
+							<colgroup>
+								<col class="col1" />
+							</colgroup>
+							<tbody></tbody>
 						</table>
 					</div>
 				</div>

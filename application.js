@@ -12,6 +12,7 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 		.addView('nobudgets', $('#nobudgetView'))
 		//.setActiveView('budget');
 			
+	var reg_number = 
 	
 	Budget.addCalculation(0, /-?(?:0|[1-9]\d{0,2}(?:,?\d{3})*)(?:\.\d+)?/, function (string, regex) {
 		return parseFloat(string.match(regex));
@@ -25,6 +26,21 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 	 	var equation = string.match(regex)[1];
 	 	
 	 	return Parser.parse( equation ).evaluate();
+	});
+	
+	Budget.addCalculation(55, /(\d+)%[\D|\s]*(\d+)/, function (string, regex) {
+		var matches = string.match(regex),
+			perc = matches[1], of = matches[2];
+			
+		return (perc * of) / 100 || 0;
+	});
+	Budget.addCalculation(55, /(\d+)[\D|\s]*(\d+)%\s+discount/, function (string, regex) {
+		var matches = string.match(regex),
+			perc = matches[2], of = matches[1];
+			
+			discount = (perc * of) / 100;
+			
+		return of - discount || 0;
 	});
 	
 	var templateStr = function (str, data) {
@@ -58,7 +74,7 @@ $(document).bind('ALL_MODULES_LOADED', function () {
  		listElem = $('ul.budgetList', viewElem),
 	 	emptyElem = $('p.empty-list', viewElem),
 	 		
- 		template = '<li data-id="{id}" title="{desc}">{name}<button>Make active</button></li>',
+ 		template = '<li data-id="{id}" title="{desc}">{name}<input type="button" value="Make active" /></li>',
  		html = '';
  		
  		Budget.getBudgetsByStatus(type, function (res) {
@@ -154,7 +170,7 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 	( function () {
 		var inactiveViews = $('#right').children('.inactiveView');
 	
-		inactiveViews.delegate('button', 'click', function (e) {
+		inactiveViews.delegate('input[type="button"]', 'click', function (e) {
 	 		var elem = $(this).parent(),
 	 			view = elem.parents('.view:first'),
 	 			emptyElem = $('p.empty-list', view),
@@ -207,16 +223,18 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 					income: [],
 					outcome: []
 				},
-				
+								
 				incomeTotal = outcomeTotal = diff = 0;
-				
+								
 				// Sort outcomes from incomes
 				for (i = 0; i < rows.length; i++) {
 					lines[rows[i].type].push( rows[i] );
 				}
 				
+				var numRows = Math.max(lines.income.length, lines.outcome.length);
+				
 				// Loop through all rows
-				for (i = 0; i < rows.length; i++) {						
+				for (i = 0; i < numRows; i++) {						
 					var inRow = lines.income[i] || '',
 						outRow = lines.outcome[i] || '',
 						
@@ -570,7 +588,7 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 	 
 	 
 	 /*
-	  * Table height  TODO: Move to window mangagment? */
+	  * Table height */
 	 ( function () {
 	 	var scrollAreas = $('.scroll-area', allViews),
 	 		doc = $(document),
@@ -623,20 +641,20 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 	 /*
 	  * Total amount update */
 	 (function () {
-	 	var totalTable = $('#totalAmount'),
-	 		totalFixed = $('#totalFixed').find('.amount'),
+	 	var totalFixed = $('#totalFixed').find('.amount'),
 	 		budgetTables = $('#budgetTables'),
 	 		
 	 		template = '<dl> \
-	 						<dt>Outcome total</dt> \
-	 							<dd>{out}</dd> \
 	 						<dt>Income total</dt> \
 	 							<dd>{in}</dd> \
+	 						<dt>Outcome total</dt> \
+	 							<dd>{out}</dd> \
 	 						<dt>Difference</dt> \
 	 							<dd class="{class}">{diff}</dd> \
 	 					</dl>';
-	 	
-	 	totalTable.bind('BUDGET_LOADED LINE_ADDED LINE_UPDATED LINE_REMOVED', function () {
+	 					
+	 	totalFixed.bind('BUDGET_LOADED LINE_ADDED LINE_UPDATED LINE_REMOVED', function () {
+	 		console.log('asdf');
 	 		var values = getTotals( $('div.income tbody', budgetTables).find('td'), $('div.outcome tbody', budgetTables).find('td') ),
 	 			html = templateStr(template, {
 	 				'out': values.outcome,
@@ -644,6 +662,7 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 	 				'diff': values.diff,
 	 				'class': values.diff > 0 ? 'positive' : 'negative'
 	 			});
+
 	 		totalFixed.html( html );
 	 	});
 	 })();

@@ -47,6 +47,7 @@ input[type="text"] {
 	font-size: 14px;
 	background-color: #fff!important;
 	border: 1px solid #888;
+	-webkit-transition: -webkit-box-shadow, border, .2s, .2s;
 	.border-radius(3px);
 	
 	&:focus {
@@ -68,6 +69,7 @@ input[type="submit"], input[type="button"] {
 	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#ecf0f2), to(#dbe4e8));
 	display: inline-block;
 	cursor: pointer;
+	-webkit-transition: all .2s;
 	
 	&:active {
 		position: relative;
@@ -344,6 +346,8 @@ input[type="submit"], input[type="button"] {
 			form {
 				width: 50%;
 				float: left;
+				position: relative;
+				white-space: nowrap;
 							
 				input[type="text"] {
 					padding: 7px;
@@ -352,7 +356,7 @@ input[type="submit"], input[type="button"] {
 					font-size: 14px;
 					width: 75%;
 					max-width: 400px;
-					min-width: 200px;
+					min-width: 100px;
 					border: 1px solid #888;
 					.border-radius(3px);
 					
@@ -369,14 +373,17 @@ input[type="submit"], input[type="button"] {
 			position: relative;
 			
 			#budgetTables {
-
+				height: 100%;
+				overflow: hidden;
+				.ddd_pixel();
+							
 				div {
 					width: 50%;
 					
-					&.outcome { float: left; }
-					&.income { float: right; }									
+					&.outcome { float: right; }
+					&.income { float: left; }									
 					
-					&:first-child { border-right: 1px solid #ddd; }
+					&:first-child { }
 					&:last-child {
 						position: relative;
 						.box-sizing(border-box);
@@ -385,7 +392,7 @@ input[type="submit"], input[type="button"] {
 					
 					table {
 						width: 100%;
-					
+
 						.col1 {
 							width: 300px;
 							min-width: 200px;
@@ -561,16 +568,29 @@ input[type="submit"], input[type="button"] {
 					padding: 10px;
 					border: 1px solid #ddd;
 					.border-radius;
-					margin-bottom: 5px;
+					margin-bottom: 3px;
 					font-size: 14px;
 					border-bottom: 1px solid #ddd;
 					background-color: #F5F5F5;
 					background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#F5F5F5), to(#F0F0F0));
+					-webkit-transition: -webkit-box-shadow, border, .1s, .1s;
 					
-					button {
+					&:hover input[type="button"] {
+						opacity: 1;
+					}
+					
+					input[type="button"] {
 						float: right;
 						position: relative;
-						top: -4px;
+						top: -6px;
+						font-size: 12px;
+						padding: 3px 15px;
+						.border-radius(15px);
+						opacity: 0;
+						
+						&:active {
+							top: -5px;
+						}
 					}
 					
 					table {
