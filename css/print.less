@@ -3,23 +3,48 @@ body {
 }
 
 #head, #left, #addRowForms, #totalFixed,
-#contextMenu, #toolbar, button, input {
-	display: none;
+#contextMenu, #toolbar, button, input, .view {
+	display: none!important;
 }
 
-#budgetTables {
-	div {
-		float: left;
+
+#right { margin: 0!important; }
+
+#printView {	
+	display: block!important;
+	
+	p {
+		font-size: 12pt;
+		line-height: 1.4;
+	}
+	
+	table {
+		border-collapse: collapse;
+		font-size: 12pt;
 		
-		table {
-			width: 300px;
+		thead th {
+			background: #eee;
+		}
+		
+		td, th {
 			border: 1px solid #888;
-			border-collapse: collapse;
+			padding: 8px;
+		}
+		
+		tr td:nth-of-type(2n) {
+			text-align: right;
+		}
+		
+		tfoot {
+			th {
+				text-align: left;
+			}
 			
-			td, th {
-				padding: 5px;
-				border: 1px solid #888;
+			&tr:first-of-type {
+				th, td {
+					border-top-width: 2px;
+				}
 			}
 		}
-	}
+	}	
 }

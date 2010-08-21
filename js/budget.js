@@ -170,11 +170,11 @@
 									};
 									
 								obj.lines.push(line);
-								
-								var json = JSON.stringify(obj, null, '\t');
-								
-								callback && callback(json);
 							}
+						
+							var json = JSON.stringify(obj, null, '\t');
+							
+							callback && callback(json);
 						});
 					}, Core.dbErrorHandler);
 				});
@@ -198,8 +198,6 @@
 								i++;
 								caller();
 								return;
-							}, function (tx, err) {
-								console.log('err', err);
 							});
 						})();
 					

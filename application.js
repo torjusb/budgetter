@@ -10,6 +10,7 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 		.addView('trashcan', $('#trashView'))
 		.addView('logbook', $('#logbookView'))
 		.addView('nobudgets', $('#nobudgetView'))
+		.addView('print', $('#printView'));
 		//.setActiveView('budget');
 			
 	var reg_number = 
@@ -132,6 +133,66 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 		});
 	};
 	
+	var makeCleanBudgetTable = function (rows) {
+		var	rowTpl = '<tr><td>{inText}</td><td class="res">{inCalc}</td><td>{outText}</td><td class="res">{outCalc}</td></tr>'
+			footTpl = '<th>{text}</th><td>{sum}</td>',
+			diffTpl = '<tr><th colspan="3">{text}</th><td class="{class}">{sum}</td></tr>',
+			
+			table = $('<table><thead><th colspan="2">Incomes</th><th colspan="2">Outcomes</th></thead></table>'),
+			tbody = $('<tbody />').appendTo(table),
+			tfoot = $('<tfoot />').appendTo(table),
+				
+			bodyHtml = footHtml = '';
+	
+		var lines = {
+			income: [],
+			outcome: []
+		},
+						
+		incomeTotal = outcomeTotal = diff = 0;
+						
+		// Sort outcomes from incomes
+		for (i = 0; i < rows.length; i++) {
+			lines[rows[i].type].push( rows[i] );
+		}
+		
+		var numRows = Math.max(lines.income.length, lines.outcome.length);
+		
+		// Loop through all rows
+		for (i = 0; i < numRows; i++) {						
+			var inRow = lines.income[i] || '',
+				outRow = lines.outcome[i] || '',
+				
+				inNum = Budget.parseExpense(inRow.text),
+				outNum = Budget.parseExpense(outRow.text);
+				
+			incomeTotal += inNum || 0;
+			outcomeTotal += outNum || 0;
+				
+			
+			bodyHtml += templateStr(rowTpl, {
+				inText: inRow.text || '',
+				inCalc: inNum,
+				outText: outRow.text || '',
+				outCalc: outNum
+			});
+		}
+		
+		tbody.append( bodyHtml );
+		
+		// Make tfoot
+		diff = parseFloat(incomeTotal - outcomeTotal);
+		footHtml += '<tr>';
+		footHtml += templateStr(footTpl, { text: 'Total', sum: incomeTotal });
+		footHtml += templateStr(footTpl, { text: 'Total', sum: outcomeTotal });
+		footHtml += '</tr>';
+		footHtml += templateStr(diffTpl, { text: 'Difference', sum: diff || '0', 'class': diff >= 0 ? 'positive' : 'negative' });
+		
+		tfoot.append ( footHtml );
+
+		return table;
+	};
+	
 
 	/*
 	 * Navigation */
@@ -191,21 +252,11 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 	/*
 	 * Logbook - view budget */
 	( function () {
-		var list = $('#logbookView').find('ul.budgetList'),
-			
-			rowTpl = '<tr><td>{inText}</td><td class="res">{inCalc}</td><td>{outText}</td><td class="res">{outCalc}</td></tr>'
-			footTpl = '<th>{text}</th><td>{sum}</td>',
-			diffTpl = '<tr><th colspan="3">{text}</th><td class="{class}">{sum}</td></tr>';
+		var list = $('#logbookView').find('ul.budgetList');
 	
 		list.delegate('li', 'click', function (e) {
 			var elem = $(this),
-
-				table = $('<table><thead><th colspan="2">Incomes</th><th colspan="2">Outcomes</th></thead></table>'),
-				tbody = $('<tbody />').appendTo(table),
-				tfoot = $('<tfoot />').appendTo(table),
-				
-				id = parseInt(elem.attr('data-id')),
-				bodyHtml = footHtml = '';
+				id = parseInt(elem.attr('data-id'));
 			
 			if (elem.hasClass('expanded')) {
 				elem.removeClass('expanded');
@@ -219,51 +270,7 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 			}
 			
 			Budget.getBudgetLines(id, function (rows) {
-				var lines = {
-					income: [],
-					outcome: []
-				},
-								
-				incomeTotal = outcomeTotal = diff = 0;
-								
-				// Sort outcomes from incomes
-				for (i = 0; i < rows.length; i++) {
-					lines[rows[i].type].push( rows[i] );
-				}
-				
-				var numRows = Math.max(lines.income.length, lines.outcome.length);
-				
-				// Loop through all rows
-				for (i = 0; i < numRows; i++) {						
-					var inRow = lines.income[i] || '',
-						outRow = lines.outcome[i] || '',
-						
-						inNum = Budget.parseExpense(inRow.text),
-						outNum = Budget.parseExpense(outRow.text);
-						
-					incomeTotal += inNum || 0;
-					outcomeTotal += outNum || 0;
-						
-					
-					bodyHtml += templateStr(rowTpl, {
-						inText: inRow.text || '',
-						inCalc: inNum,
-						outText: outRow.text || '',
-						outCalc: outNum
-					});
-				}
-				
-				tbody.append( bodyHtml );
-				
-				// Make tfoot
-				diff = parseFloat(incomeTotal - outcomeTotal);
-				footHtml += '<tr>';
-				footHtml += templateStr(footTpl, { text: 'Total', sum: incomeTotal });
-				footHtml += templateStr(footTpl, { text: 'Total', sum: outcomeTotal });
-				footHtml += '</tr>';
-				footHtml += templateStr(diffTpl, { text: 'Difference', sum: diff || '0', 'class': diff >= 0 ? 'positive' : 'negative' });
-				
-				tfoot.append ( footHtml );
+				var table = makeCleanBudgetTable(rows);
 				
 				table.appendTo(elem);
 				elem.attr('data-loaded', 1);
@@ -783,9 +790,29 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 	/*
 	 * Print */
 	( function () {
-		var button = $('#print');
+		var button = $('#print'),
+			printView = $('#printView'),
+			titleElem = $('h1.title', printView),
+			descElem = $('p.description', printView),
+			tableElem = $('div.table', printView);
 		
 		button.bind('click', function () {
+			//View.setActiveView('print');
+			
+			Budget.getBudgetLines(35, function (rows) {
+				var table = makeCleanBudgetTable(rows);
+				
+				Budget.getTitle( function (title) {
+					titleElem.text( title );
+				});
+				Budget.getDescription( function (desc) {
+					descElem.text( desc );
+				});
+				
+				tableElem.html( table );
+			});
+			
+			
 			window.print();
 		});
 	})();
@@ -806,14 +833,14 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 					overlayShow: false,
 					onComplete: function () {
 						Budget.exportToJSON(null, function (json) {
-							$('#fancybox-wrap').find('textarea').val( json )
+							$('#fancybox-outer').find('textarea').val( json )
 						});
 					}
 				});
 			}, 'html');
 		});
 		
-		$('#fancybox-wrap').delegate('textarea', 'focus', function (e) {
+		$('#fancybox-outer').delegate('textarea', 'focus', function (e) {
 			e.preventDefault();
 			// $(this).select(); TODO: make it work
 		});
@@ -826,7 +853,7 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 		
 		button.bind('click', importBudgetFunc);
 		
-		$('#fancybox-wrap').delegate('#import_budget_form', 'submit', function (e) {
+		$('#fancybox-outer').delegate('#import_budget_form', 'submit', function (e) {
 			e.preventDefault();
 			
 			var json = $('textarea[name="json"]', this).val();
@@ -841,9 +868,55 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 	})();
 	
 	/*
+	 * Mail budget */
+	( function () {
+		var button = $('#mail'),
+			fancy = $('#fancybox-outer');
+		
+		button.bind('click', function () {
+			$.get('ajax/mail_budget.html', function (res) {
+				$.fancybox({
+					content: res,
+					width: 500,
+					height: 500,
+					padding: 0,
+					scrolling: 'no',
+					autoDimensions: false,
+					overlayShow: false,
+					onStart: function () {
+						Budget.getTitle( function (title) {
+							$('input[name="title"]', fancy).val( title );
+						});
+						Budget.getDescription( function (desc) {
+							$('textarea[name="message"]', fancy).text( desc );
+						});
+					}
+				});
+			});
+		});
+		
+		fancy.delegate('#mail_budget_form', 'submit', function (e) {
+			e.preventDefault();
+			
+			var form = $(this);
+			
+			Budget.exportToJSON(null, function (json) {
+				var budgetToPrint = {
+					form: form.serializeArray(),
+					budget: json
+				}
+				
+				console.log(JSON.stringify(budgetToPrint));
+			});
+						
+		});
+	})();
+	
+	
+	/*
 	 * General fancybox */
 	( function () {
-		$('#fancybox-wrap').delegate('input.cancel', 'click', function () {
+		$('#fancybox-outer').delegate('input.cancel', 'click', function () {
 			$.fancybox.close();
 		});
 	})();
