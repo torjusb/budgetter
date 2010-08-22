@@ -1,0 +1,42 @@
+<script>
+	less.sheets.push( $('<link rel="stylesheet/less" href="css/unsupported.less" />')[0] );
+	less.refresh();
+</script>
+<h1>Oh snap!</h1>
+<p>Looks like your browser doesn't support some of the features required by this application.</p>
+
+<p>Your browser is missing the following features:</p>
+<ul id="unsupported">
+	
+</ul>
+
+<h2>Supported browsers</h2>
+<ul class="browsers">
+	<li>
+		<a href="http://www.google.com/chrome"><img src="gfx/chrome.png" alt="Google Chrome" /></a>
+	</li>
+	<li>
+		<a href="http://www.apple.com/safari/download/"><img src="gfx/safari.png" alt="Safari" /></a>
+	</li>
+	<li class="half">
+		<a href="http://www.opera.com/"><img src="gfx/opera.png" alt="Opera" /></a> <sup>*</sup>
+	</li>
+</ul>
+<p class="note"><sup>*</sup> Some things might not look as pretty. Google Chrome and Safari are recommended.</p>
+
+<script type="text/javascript">
+	var list = $('#unsupported'),
+		support = $('body').data('missing_features'),
+		
+		html = '';
+	
+	for (feature in support) {
+		var isSupported = support[feature];
+		
+		if (!isSupported) {
+			html += '<li>' + feature + '</li>';
+		}
+		
+		list.html( html );
+	}
+</script>

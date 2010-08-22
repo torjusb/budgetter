@@ -1,0 +1,84 @@
+/**
+ 	- MIXINS 
+ **/
+
+.border-radius(@radius: 5px) {
+	-webkit-border-radius: @radius;
+	-moz-border-radius: @radius;
+	border-radius: @radius;
+}
+.box-shadow(@property) {
+	-webkit-box-shadow: @property;
+	-moz-box-shadow: @property;
+	box-shadow: @property;
+}
+.box-sizing(@property) {
+	-webkit-box-sizing: @property;
+	-moz-box-sizing: @property;
+	box-sizing: @property;
+}
+
+/**
+ 	- MIXINS END 
+ **/
+
+
+html {
+	background: #eee;
+}
+body {
+	width: 500px;
+	margin: 100px auto;
+	line-height: 1.4;
+	background: #fff;
+	padding: 40px;
+	border: 1px solid #ddd;
+	.box-shadow(inset 0 2px 5px rgba(0, 0, 0, .1));
+	.border-radius();
+}
+
+h1 {
+	font-size: 25px;
+	margin-bottom: 15px;
+}
+
+p {
+	font-size: 14px;
+	color: #272727;
+	text-shadow: 1px 1px 0 #fff;
+	margin-top: 15px; 
+}
+
+#unsupported {
+	margin: 10px 0;
+	color: #D75351;
+}
+
+h2 {
+	margin-top: 20px;
+	border-top: 1px solid #888;
+	padding-top: 15px;
+	margin-bottom: 5px;
+}
+
+.browsers {
+	list-style: none;
+	
+	li {
+		display: inline-block;
+		margin-right: 20px;
+		
+		&.half {
+			opacity: .5;
+		}
+		
+		sup {
+			vertical-align: 50px;
+		}
+	}
+}
+
+p.note {
+	font-size: 12px;
+	color: #888;
+}
