@@ -105,7 +105,7 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 					var row = rows[type][i],
 						expense = Budget.parseExpense( row.text );
 												
-					html = html + '<tr><th contenteditable data-id="' + row.id + '" data-parent-id="' + parentId + '"><input type="button" value="Remove" title="Remove">' + row.text + '</th><td>' + expense + '</td></tr>';
+					html = html + '<tr><th data-id="' + row.id + '" data-parent-id="' + parentId + '"><input type="button" value="Remove" title="Remove" /><span contenteditable>' + row.text + '</span></th><td>' + expense + '</td></tr>';
 					
 					parentId = row.id;
 				}
@@ -680,7 +680,7 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 	 	var budgetTables = $('#budgetTables'),
 	 		prevValue;
 
-	 	budgetTables.delegate('th', 'keydown focusin focusout', function (e) {
+	 	budgetTables.delegate('span', 'keydown focusin focusout', function (e) {
 	 		var elem = $(this),
 	 			value = elem.text();
 	 			 		
@@ -690,9 +690,9 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 	 				break;
 	 			case 'focusout':
 	 				if (value.trim().length > 0) {
-	 					Budget.updateLine( value, elem.attr('data-id') );
+	 					Budget.updateLine( value, elem.parent().attr('data-id') );
 	 					
-	 					elem.next().text( Budget.parseExpense(value) );	 					
+	 					elem.parent().next().text( Budget.parseExpense(value) );	 					
 	 				} else {
 	 					elem.text ( prevValue );
 	 				}
@@ -866,52 +866,7 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 			});
 		});
 	})();
-	
-	/*
-	 * Mail budget */
-	( function () {
-		var button = $('#mail'),
-			fancy = $('#fancybox-outer');
-		
-		button.bind('click', function () {
-			$.get('ajax/mail_budget.html', function (res) {
-				$.fancybox({
-					content: res,
-					width: 500,
-					height: 500,
-					padding: 0,
-					scrolling: 'no',
-					autoDimensions: false,
-					overlayShow: false,
-					onStart: function () {
-						Budget.getTitle( function (title) {
-							$('input[name="title"]', fancy).val( title );
-						});
-						Budget.getDescription( function (desc) {
-							$('textarea[name="message"]', fancy).text( desc );
-						});
-					}
-				});
-			});
-		});
-		
-		fancy.delegate('#mail_budget_form', 'submit', function (e) {
-			e.preventDefault();
-			
-			var form = $(this);
-			
-			Budget.exportToJSON(null, function (json) {
-				var budgetToPrint = {
-					form: form.serializeArray(),
-					budget: json
-				}
-				
-				console.log(JSON.stringify(budgetToPrint));
-			});
-						
-		});
-	})();
-	
+
 	
 	/*
 	 * General fancybox */
