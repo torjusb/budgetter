@@ -32,19 +32,23 @@ jQuery( function ($) {
 		},
 		
 		testFeatures = function (features) {
-			var errors = 0, html = '<ul>';
+			var numErrors = 0,
+				supports = {
+			
+				};
 			
 			for (i = 0; i < features.length; i++) {
-				if (!Modernizr[features[i]]) {
-					errors++;
-					html += '<li>' + features[i] + ' not supported</li>';
-				}
+				supports[features[i]] = true;
 				
+				if (!Modernizr[features[i]]) {
+					numErrors++;				
+					
+					supports[features[i]] = false;
+				}
 			}
-			html += '</ul>';
 			
-			if (errors > 0) {
-				body.append(html);
+			if (numErrors > 0) {
+				$('body').data('missing_features', supports).load('pages/unsupported.html')
 				
 				return false;
 			}

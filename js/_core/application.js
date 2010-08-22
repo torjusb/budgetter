@@ -12,37 +12,6 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 		.addView('nobudgets', $('#nobudgetView'))
 		.addView('print', $('#printView'));
 		//.setActiveView('budget');
-			
-	var reg_number = 
-	
-	Budget.addCalculation(0, /-?(?:0|[1-9]\d{0,2}(?:,?\d{3})*)(?:\.\d+)?/, function (string, regex) {
-		return parseFloat(string.match(regex));
-	});
-	Budget.addCalculation(50, /(\d+).*\sa\s(\d+)/, function (string, regex) {
-	 	var matches = string.match(regex);
-	 	
-	 	return parseFloat(matches[1] * matches[2]);
-	});
-	Budget.addCalculation(50, /m\((.+)\)/, function (string, regex) {
-	 	var equation = string.match(regex)[1];
-	 	
-	 	return Parser.parse( equation ).evaluate();
-	});
-	
-	Budget.addCalculation(55, /(\d+)%[\D|\s]*(\d+)/, function (string, regex) {
-		var matches = string.match(regex),
-			perc = matches[1], of = matches[2];
-			
-		return (perc * of) / 100 || 0;
-	});
-	Budget.addCalculation(55, /(\d+)[\D|\s]*(\d+)%\s+discount/, function (string, regex) {
-		var matches = string.match(regex),
-			perc = matches[2], of = matches[1];
-			
-			discount = (perc * of) / 100;
-			
-		return of - discount || 0;
-	});
 	
 	var templateStr = function (str, data) {
 		return str.replace(/\{([a-zA-Z1-9]+)\}/g, function (match, tag) {
@@ -661,12 +630,11 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 	 					</dl>';
 	 					
 	 	totalFixed.bind('BUDGET_LOADED LINE_ADDED LINE_UPDATED LINE_REMOVED', function () {
-	 		console.log('asdf');
 	 		var values = getTotals( $('div.income tbody', budgetTables).find('td'), $('div.outcome tbody', budgetTables).find('td') ),
 	 			html = templateStr(template, {
-	 				'out': values.outcome,
-	 				'in': values.income,
-	 				'diff': values.diff,
+	 				'out': values.outcome || '0',
+	 				'in': values.income || '0',
+	 				'diff': values.diff || '0',
 	 				'class': values.diff > 0 ? 'positive' : 'negative'
 	 			});
 
