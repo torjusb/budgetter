@@ -123,11 +123,11 @@ Below is an example budget that can be imported into Budgetter.
 ## FAQ
 
 <dl>
-	<dt>Browser Support<dt>
+	<dt>Which browsers are supported?<dt>
 		<dd>Only Chrome, Safari, and Opera supports WebSQLDatabases and localStorage at the moment, so the application will only work in these browsers. Opera is still lacking a lot of CSS3 functionality, so some stuff might not work as well in Opera.
 		Unsupported browsers falls back to a page telling the user which browsers are supported.</dd>
 		
-	<dt>Logging and deleting budgets</dt>
+	<dt>How do I delete and log a budget?</dt>
 		<dd>Right click on the budget in the budget list to bring up the context menu, and select "Delete" or "Log budget"</dd>
 </dl>
 

@@ -26,6 +26,12 @@
 			};
 		
 		Budget =  {
+		
+			/**
+			 * Creates a new budget
+			 *
+			 * @param {String} budget_name Name of the budget to be created
+			 */
 			newBudget: function (budget_name) {		
 				db.transaction( function (tx) {
 					tx.executeSql('INSERT INTO budgets (name) VALUES (?)', [budget_name], function (tx, res) {
@@ -35,6 +41,15 @@
 					}, Core.dbErrorHandler);
 				});
 			},
+			
+			/**
+			 * Adds a new line to a budget
+			 *
+			 * @param {String} type Type of line to be added, 'outcome' or 'income'
+			 * @param {String} text Text to be added to the line
+			 * @param {Int} parent_id Id of the line above
+			 * @param {Int} budget_id Id of the budget the line should be added to
+			 */
 			addLine: function (type, text, parent_id, budget_id) {
 				budget_id = budget_id || loadedBudget;
 				
@@ -47,6 +62,14 @@
 					}, Core.dbErrorHandler);
 				});
 			},
+			
+			/**
+			 * Update line with new text
+			 * 
+			 * @param {String} text New text of the line
+			 * @param {Int} line_id Id of the line
+			 * @param {Int} budget_id Id of the budget the line belongs to
+			 */
 			updateLine: function (text, line_id, budget_id) {
 				budget_id = budget_id || loadedBudget;
 				
@@ -56,6 +79,14 @@
 					}, Core.dbErrorHandler);
 				});
 			},
+			
+			/**
+			 * Removes a line from a budget
+			 *
+			 * @param {Int} line_id Id of line to be removed
+			 * @param {Int} budget_id Id of budget the line belongs to
+			 * @param {Function} callback Function called when the line is removed
+			 */
 			removeLine: function (line_id, positions, budget_id, callback) {
 				budget_id = budget_id || loadedBudget;
 				
@@ -71,6 +102,13 @@
 					}, Core.dbErrorHandler)
 				});
 			},
+			
+			/**
+			 * Updates multiple lines with new positions
+			 *
+			 * @param {Object} positions Object containing the new positions of the lines
+			 * @param {Int} budget_id Id of the budget the lines belong to
+			 */			
 			updateLinePositions: function (positions, budget_id) {
 				budget_id = budget_id || loadedBudget;
 				
@@ -83,6 +121,13 @@
 					};
 				});
 			},
+			
+			/**
+			 * Get a list of all the budgets
+			 *
+			 * @param {Function} callback Function called after the sql has been executed
+			 * @return {Function} The callback function executed with an object containing the budgets as first argument
+			 */
 			getBudgets: function (callback) {
 				db.transaction( function (tx) {		
 					tx.executeSql('SELECT * FROM budgets WHERE status = "active"', [], function (tx, res) {
@@ -97,6 +142,13 @@
 					}, Core.dbErrorHandler);
 				});
 			},
+			
+			/**
+			 * Load a budget by id
+			 *
+			 * @param {Int} budget_id Id of budget to be loaded
+			 * @param {Function} callback Function to be executed once the sql finishes
+			 */
 			loadBudget: function (budget_id, callback) {
 				localStorage.setItem('loadedBudget', budget_id);
 				loadedBudget = budget_id;
@@ -128,6 +180,13 @@
 					}, Core.dbErrorHandler);
 				});
 			},
+			
+			/**
+			 * Get all lines belonging to a budget
+			 *
+			 * @param {Int} budget_id Id of budget containing the lines
+			 * @param {Function} callback Function to be executed once the sql finishes
+			 */
 			getBudgetLines: function (budget_id, callback) {
 				budget_id = budget_id || loadedBudget;
 				
@@ -147,6 +206,13 @@
 					});
 				});
 			},
+			
+			/**
+			 * Exports a budget as JSON
+			 *
+			 * @param {Int} budget_id Id of budget
+			 * @param {Function} callback Function to be executed once the sql finishes
+			 */
 			exportToJSON: function (budget_id, callback) {
 				budget_id = budget_id || loadedBudget;
 				
@@ -179,9 +245,16 @@
 					}, Core.dbErrorHandler);
 				});
 			},
+			
+			/**
+			 * Creates a budget from a JSON object
+			 *
+			 * @param {String} json JSON-string containging the budget and its lines
+			 * @param {Function} callback Function to be executed once the budget has been added
+			 */
 			importFromJSON: function (json, callback) {
 				json = JSON.parse(json);
-				// tx.executeSql('INSERT INTO budgets (name) VALUES (?)', [budget_name], function (tx, res) {
+
 				db.transaction( function (tx) {				
 					tx.executeSql('INSERT INTO budgets (name, description, status) VALUES (:name, :description, :status)', [json.name, json.description, json.status], function (tx, res) {
 						var newBudgetId = res.insertId, i = 0;
@@ -204,6 +277,13 @@
 					}, Core.dbErrorHandler);
 				});
 			},
+			
+			/**
+			 * Get budgets by status
+			 *
+			 * @param {String} status Status of the budgets
+			 * @param {Function} callback Function executed once the sql finishes
+			 */
 			getBudgetsByStatus: function (status, callback) {
 				if (_statuses.indexOf(status) === -1) {
 					throw new Error("Can't get budgets with status: " + status);
@@ -215,6 +295,14 @@
 					}, Core.dbErrorHandler);
 				});
 			},
+			
+			/**
+			 * Update a budget and set new status
+			 *
+			 * @param {String} status New status of budget
+			 * @param {Int} budget_id Id of budget to update
+			 * @param {Function} callback Function executed once the sql finishes
+			 */
 			setBudgetStatus: function (status, budget_id, callback) {	
 				if (_statuses.indexOf(status) === -1) {
 					throw new Error("Can't set budget status to " + status);
@@ -228,6 +316,13 @@
 					});
 				});
 			},
+			
+			/**
+			 * Moves a budget to the trash
+			 *
+			 * @param {Int} budget_id Id of budget to be deleted
+			 * @param {Function} callback Function executed once the sql finishes
+			 */
 			removeBudget: function (budget_id, callback) {
 				budget_id = budget_id || loadedBudget;
 				
@@ -237,6 +332,13 @@
 					}, null, Core.dbErrorHandler);
 				});
 			},
+			
+			/**
+			 * Moves a budget to the logbook
+			 *
+			 * @param {Int} budget_id Id of the budget to be logged
+			 * @param {Function} callback Function executed once the sql finishes
+			 */
 			logBudget: function (budget_id, callback) {
 				budget_id = budget_id || loadedBudget;
 				
@@ -246,6 +348,13 @@
 					}, null, Core.dbErrorHandler);
 				});
 			},
+			
+			/**
+			 * Updates a budget and sets a new description
+			 *
+			 * @param {String} description The new description of the budget
+			 * @param {Int} budget_id Id of the budget to be updated
+			 */
 			setDescription: function (description, budget_id) {
 				budget_id = budget_id || loadedBudget;
 				
@@ -253,6 +362,13 @@
 					tx.executeSql('UPDATE budgets SET description = ? WHERE id = ?', [description, budget_id], null, Core.dbErrorHandler);
 				});
 			},
+			
+			/**
+			 * Get the description of a budget
+			 *
+			 * @param {Function} callback Function executed once the sql finishes with the description as the first argument
+			 * @param {Int} budget_id Id of the budget to retrieve description from
+			 */
 			getDescription: function (callback, budget_id) {
 				budget_id = budget_id || loadedBudget;
 				
@@ -264,6 +380,13 @@
 					});
 				}, Core.dbErrorHandler);
 			},
+			
+			/**
+			 * Updates a budget and sets a new title
+			 *
+			 * @param {String} title The new title of the budget
+			 * @param {Int} budget_id Id of the budget to be updated
+			 */
 			setTitle: function (title, budget_id) {
 				budget_id = budget_id || loadedBudget;
 				
@@ -271,6 +394,13 @@
 					tx.executeSql('UPDATE budgets SET name = ? WHERE id = ?', [title, budget_id]);
 				});
 			},
+			
+			/**
+			 * Get the title of a budget
+			 *
+			 * @param {Function} callback Function executed once the sql finishes with the title as the first argument
+			 * @param {Int} budget_id Id of the budget to retrieve title from
+			 */
 			getTitle: function (callback, budget_id) {
 				budget_id = budget_id || loadedBudget;
 				
@@ -282,6 +412,14 @@
 					});
 				}, Core.dbErrorHandler);
 			},
+			
+			/**
+			 * Adds a new calculation pattern
+			 *
+			 * @param {Int} priority Sets the priority of the calculation. The higher the priority, the earlier it's checked
+			 * @param {RegExp} regex The regexp the text is matched against
+			 * @param {Function} fn Function executed when the regexp is matched against the text. The return value of this function is used as the result
+			 */
 			addCalculation: function (priority, regex, fn) {
 				var obj = {
 					priority: priority,
@@ -294,6 +432,13 @@
 					return a.priority < b.priority;
 				});
 			},
+			
+			/**
+			 * Parse an outcome or income
+			 *
+			 * @param {String} text String to be parsed
+			 * @return {Int} Number returned by the calculation the string matched against, else 0
+			 */
 			parseExpense: function (text) {
 				for (y = 0; y < calculations.length; y++) {
 					var cal = calculations[y];

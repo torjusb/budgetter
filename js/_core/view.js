@@ -14,11 +14,26 @@
 			_activeView;
 		
 		View = {
+			
+			/**
+			 * Adds a new view
+			 *
+			 * @param {Int} id Identifier of the view
+			 * @param {Object} view The view element
+			 * @return {Object} View API for chaining
+			 */
 			addView: function (id, view) {
 				_views[id] = view;
 				
 				return View;
 			},
+			
+			/**
+			 * Make a view active
+			 *
+			 * @param {Int} id Identifier of view
+			 * @return {Object} View API for chaining
+			 */ 
 			setActiveView: function (id) {
 				_activeView = _views[id];
 				
@@ -31,9 +46,21 @@
 				
 				return View;
 			},
+			
+			/**
+			 * Get the current view
+			 *
+			 * @return {Object} jQuery object of the current view
+			 */
 			getActiveView: function () {
 				return _activeView;
 			},
+			
+			/**
+			 * Get all registered views
+			 *
+			 * @return {Object} Object containing all the views
+			 */
 			getAllViews: function () {
 				return _views;
 			}

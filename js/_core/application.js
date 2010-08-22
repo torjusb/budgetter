@@ -11,7 +11,6 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 		.addView('logbook', $('#logbookView'))
 		.addView('nobudgets', $('#nobudgetView'))
 		.addView('print', $('#printView'));
-		//.setActiveView('budget');
 	
 	var templateStr = function (str, data) {
 		return str.replace(/\{([a-zA-Z1-9]+)\}/g, function (match, tag) {

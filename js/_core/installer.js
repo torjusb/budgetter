@@ -5,7 +5,8 @@ jQuery( function ($) {
 		body = $('body'),
 		
 		coreFeatures = ['websqldatabase', 'localstorage'],
-	
+		
+		// Called after the application has been installed
 		startApplication = function () {
 			body.load('pages/application.html', function () {
 				Core.loadAllModules();
@@ -13,6 +14,8 @@ jQuery( function ($) {
 			});
 		},
 		
+		// Installs the application, by executing all the required sql
+		// found in the 'sql/install.sql' file
 		install = function () {
 			$.get('sql/install.sql', {}, function (data) {
 				var sql = data.split("\n");
@@ -31,11 +34,11 @@ jQuery( function ($) {
 			});
 		},
 		
+		// Checks to see if the browser supports all the required
+		// core features
 		testFeatures = function (features) {
 			var numErrors = 0,
-				supports = {
-			
-				};
+				supports = {};
 			
 			for (i = 0; i < features.length; i++) {
 				supports[features[i]] = true;
@@ -48,7 +51,7 @@ jQuery( function ($) {
 			}
 			
 			if (numErrors > 0) {
-				$('body').data('missing_features', supports).load('pages/unsupported.html')
+				body.data('missing_features', supports).load('pages/unsupported.html')
 				
 				return false;
 			}
@@ -57,10 +60,12 @@ jQuery( function ($) {
 			
 			return true;
 		};
-		
+	
+	// Application is already installed, start it	
 	if (Modernizr.localstorage && !!localStorage.getItem('app_installed')) {
 		startApplication();
 	} else {
+		// Application is not installed, check if the browser can install it
 		if ( testFeatures(coreFeatures) ) {
 			install();
 		}
