@@ -675,6 +675,11 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 	 				break;
 	 		}
 	 	});
+	 	
+	 	/* Hack for opera */
+	 	budgetTables.delegate('tr', 'click', function () {
+	 		$('span', this).focus();
+	 	});
 	 })();
 	 
 	 /*
@@ -831,6 +836,7 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 				Budget.loadBudget( budgetId );
 				
 				budgetList.children().removeClass('selected').filter('li[data-budget-id="' + budgetId + '"]').addClass('selected');
+				$.fancybox.close();
 			});
 		});
 	})();
