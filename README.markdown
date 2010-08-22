@@ -126,7 +126,7 @@ Below is an example budget that can be imported into Budgetter.
 		Unsupported browsers falls back to a page telling the user which browsers are supported.</dd>
 		
 	<dt>Logging and deleting budgets</dt>
-		<dd>Right click on the budget in the budget list to bring up the context menu, and select "Delete" or "Log budget"
+		<dd>Right click on the budget in the budget list to bring up the context menu, and select "Delete" or "Log budget"</dd>
 </dl>
 
 ## Future
