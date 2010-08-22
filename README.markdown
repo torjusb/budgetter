@@ -86,7 +86,8 @@ Exporting and importing budgets allows the user to easily move budgets from comp
 
 Below is an example budget that can be imported into Budgetter.
 
-<textarea>{
+<pre><code>
+{
 	"name": "Trip to Spain",
 	"description": "Lorem ipsum dolor sit",
 	"status": "active",
@@ -116,7 +117,8 @@ Below is an example budget that can be imported into Budgetter.
 			"type": "outcome"
 		}
 	]
-}</textarea>
+}
+</code></pre>
 
 ## FAQ
 
