@@ -143,7 +143,8 @@ Here is a list of things I would like to implement in future versions of Budgett
   * Use a manifest use put files offline
   * Support for Firefox 4, with IndexedDB whenever that comes. Will probably require quite a bit of rewriting.
   * Better icons
-  * Replace the `eval` in the `m()` calculation with a safer solution. Currently protected by a regex
+  * Currency converter
+  * Replace the eval in the `m()` calculation with a safer solution. Currently protected by a regex
 
 ## Credits
 
