@@ -44,7 +44,7 @@ Budgetter is inspired by the desktop application [Soulver](http://www.acqualia.c
 			<td>32.5</td>
 		</tr>
 		<tr>
-			<td>m(&lt;math eqution&gt;)</td>
+			<td>m(&lt;math equation&gt;)</td>
 			<td>m(990/30*45+3)</td>
 			<td>1488</td>
 		</tr>
