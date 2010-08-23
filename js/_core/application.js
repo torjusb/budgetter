@@ -821,11 +821,6 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 				});
 			}, 'html');
 		});
-		
-		$('#fancybox-outer').delegate('textarea', 'focus', function (e) {
-			e.preventDefault();
-			// $(this).select(); TODO: make it work
-		});
 	})();
 	
 	/*
