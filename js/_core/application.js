@@ -329,7 +329,8 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 			Budget.getBudgets( refreshBudgetList );
 		});
 		Budget.getBudgets( refreshBudgetList );
-		budgetList.delegate('li', 'contextmenu focusout keydown', function (e) {
+		
+		budgetList.delegate('li', 'contextmenu focusin focusout keydown', function (e) {
 			var elem = $(this),
 				budgetId = elem.attr('data-budget-id'),
 				contextMenu;
@@ -338,8 +339,17 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 				case 'contextmenu':
 					openContextMenu(e, elem.attr('data-budget-id'));
 					break;
+				case 'focusin':
+					elem.data('preValue', elem.text());
+					break;
 				case 'focusout':
 					elem.removeAttr('contenteditable');
+					if (elem.text().trim().length < 1) {
+						elem.text( elem.data('preValue') );
+						elem.removeData('preValue');
+						return;
+					}
+					$('#budgetInfo').find('h1').text( elem.text() );
 					Budget.setTitle( elem.text(), budgetId );
 					break;
 				case 'keydown':
@@ -382,12 +392,12 @@ $(document).bind('ALL_MODULES_LOADED', function () {
 			
 			switch (e.type) {
 				case 'focusout':
-					if (/^\s*$/.test(value)) {
-						// todo: throw error, reset name
+					if (value.trim().length < 1) {
 						field.blur();
 						updateBudgetInfo();
 					} else {
 						Budget.setTitle( value );
+						Budget.getBudgets( refreshBudgetList );
 					}
 				case 'keydown':
 					if (e.keyCode === 13) {
